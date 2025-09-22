@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/68213482?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## ShaderLab 数学函数
+
+### 修饰符
+
+| **修饰符** | **解析**                                                     |
+| :--------: | :----------------------------------------------------------- |
+|   const    | 变量被定义成常量的话，在程序中，就不能再对该变量赋值，除非const和uniform，varying一起使用。">
+<meta property="og:title" content="ShaderLab 数学函数">
+<meta property="og:description" content="## ShaderLab 数学函数
+
+### 修饰符
+
+| **修饰符** | **解析**                                                     |
+| :--------: | :----------------------------------------------------------- |
+|   const    | 变量被定义成常量的话，在程序中，就不能再对该变量赋值，除非const和uniform，varying一起使用。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ogazen.github.io/post/ShaderLab%20-shu-xue-han-shu.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/68213482?v=4">
+<title>ShaderLab 数学函数</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">ShaderLab 数学函数</h1>
+<div class="title-right">
+    <a href="https://ogazen.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/oGazen/ogazen.github.io/issues/2" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>ShaderLab 数学函数</h2>
+<h3>修饰符</h3>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th align="center"><strong>修饰符</strong></th>
+<th align="left"><strong>解析</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">const</td>
+<td align="left">变量被定义成常量的话，在程序中，就不能再对该变量赋值，除非const和uniform，varying一起使用。const修饰的变量，需要在声明时给予一个初始值</td>
+</tr>
+<tr>
+<td align="center">extern</td>
+<td align="left">extern表明声明仅仅是声明，而非定义。在程序中一定有一个地方存在一个非extern的对应的声明</td>
+</tr>
+<tr>
+<td align="center">in</td>
+<td align="left">只在声明参数，或是使用varying修饰符时使用。将参数，或是varying作为函数或是程序的输入值。函数参数如果没有in，out，或者inout的话，隐式的默认为in</td>
+</tr>
+<tr>
+<td align="center">inline</td>
+<td align="left">只在函数定义时有用，告诉编译器始终对该函数采取内联调用</td>
+</tr>
+<tr>
+<td align="center">inout</td>
+<td align="left">只在声明为参数和varying时使用，将参数或是varying声明为函数或是程序的输入输出值</td>
+</tr>
+<tr>
+<td align="center">static</td>
+<td align="left">只在声明全局变量时使用，static将使变量对程序而言成为私有的，外部不可见，不能和uniform，varying一起使用</td>
+</tr>
+<tr>
+<td align="center">out</td>
+<td align="left">只在声明参数和varying时使用，将变量或varying定义为函数或是程序的输出值</td>
+</tr>
+<tr>
+<td align="center">uniform</td>
+<td align="left">用于全局变量和程序的入口函数的参数，用来定义constant buffers(常量缓存)。如果用于一个非入口函数的参数，它将被忽略。这样做的目的是为了使一个函数既能作为入口函数，又能作为非入口函数。uniform的变量可以像非uniform的变量那样读写。uniform修饰符通过向外部语言提供一个机制，来提供变量的初始值是如何指定和保存的信息。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h3>数学函数</h3>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th align="center"><strong>函数名</strong></th>
+<th><strong>功能描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">ceil(x)</td>
+<td>对输入参数向上取整。例如： ceil(float(1.3)) ，其返回值为2.0</td>
+</tr>
+<tr>
+<td align="center">floor(x)</td>
+<td>对输入参数向下取整。例如floor(float(1.3))返回的值为1.0；但是floor(float(-1.3))返回的值为-2.0。该函数与ceil(x)函数相对应。</td>
+</tr>
+<tr>
+<td align="center">fmod(x,y)</td>
+<td>返回x/y的余数。如果y为0，结果不可预料。</td>
+</tr>
+<tr>
+<td align="center">frac(x)</td>
+<td>返回标量或矢量的小数</td>
+</tr>
+<tr>
+<td align="center">frexp(x, out i)</td>
+<td>将浮点数 x 分解为尾数和指数，即 $x = m * 2^i$，返回 m，并将指数存入 i 中；如果 x 为 0，则尾数和指数都返回 0</td>
+</tr>
+<tr>
+<td align="center">modf(x, out ip)</td>
+<td>把x分解成整数和分数两部分，每部分都和x有着相同的符号，整数部分被保存在ip中，分数部分由函数返回</td>
+</tr>
+<tr>
+<td align="center">round(x)</td>
+<td>返回四舍五入值。</td>
+</tr>
+<tr>
+<td align="center">exp(x)</td>
+<td>计算$e_2^x$的值，e=2.71828182845904523536</td>
+</tr>
+<tr>
+<td align="center">exp2(x)</td>
+<td>计算$2^x$的值</td>
+</tr>
+<tr>
+<td align="center">log(x)</td>
+<td>计算$ln(x)$的值，x必须大于0</td>
+</tr>
+<tr>
+<td align="center">log2(x)</td>
+<td>计算$log_2(x)$的值，x必须大于0</td>
+</tr>
+<tr>
+<td align="center">log10(x)</td>
+<td>计算$lg(x)$的值，x必须大于0</td>
+</tr>
+<tr>
+<td align="center">max(a, b)</td>
+<td>比较两个标量或等长向量元素，返回最大值</td>
+</tr>
+<tr>
+<td align="center">min(a,b)</td>
+<td>比较两个标量或等长向量元素，返回最小值。</td>
+</tr>
+<tr>
+<td align="center">pow(x, y)</td>
+<td>计算$x^y$的值</td>
+</tr>
+<tr>
+<td align="center">sqrt(x)</td>
+<td>求x的平方根，，x必须大于0</td>
+</tr>
+<tr>
+<td align="center">rsqrt(x)</td>
+<td>x的平方根的倒数，x必须大于0</td>
+</tr>
+<tr>
+<td align="center">abs(x)</td>
+<td>返回输入参数的绝对值</td>
+</tr>
+<tr>
+<td align="center">ldexp(x, n)</td>
+<td>计算$x∗2^n$的值</td>
+</tr>
+<tr>
+<td align="center">mul(M, N)</td>
+<td>矩阵M和矩阵N的积</td>
+</tr>
+<tr>
+<td align="center">mul(M, v)</td>
+<td>矩阵M和列向量v的积</td>
+</tr>
+<tr>
+<td align="center">mul(v, M)</td>
+<td>行向量v和矩阵M的积</td>
+</tr>
+<tr>
+<td align="center">determinant(m)</td>
+<td>计算矩阵的行列式因子。</td>
+</tr>
+<tr>
+<td align="center">transpose(M)</td>
+<td>矩阵M的转置矩阵如果M是一个AxB矩阵，M的转置是一个BxA矩阵，它的第一列是M的第一行，第二列是M的第二行，第三列是M的第三行，等等</td>
+</tr>
+<tr>
+<td align="center">asin(x)</td>
+<td>反正弦函数,输入参数取值区间为，返回角度值范围为[−π/2,π/2]</td>
+</tr>
+<tr>
+<td align="center">acos(x)</td>
+<td>反余切函数，输入参数范围为[-1,1]， 返回[0,π]区间的角度值</td>
+</tr>
+<tr>
+<td align="center">atan(x)</td>
+<td>反正切函数，返回角度值范围为[−π/2,π/2]</td>
+</tr>
+<tr>
+<td align="center">atan2(y,x)</td>
+<td>计算y/x的反正切值。实际上和atan(x)函数功能完全一样只是输入参数不同。atan(x) = atan2(x, float(1))。</td>
+</tr>
+<tr>
+<td align="center">sin(x)</td>
+<td>输入参数为弧度，计算正弦值，返回值范围 为[-1,1]</td>
+</tr>
+<tr>
+<td align="center">cos(x)</td>
+<td>返回弧度x的余弦值。返回值范围为</td>
+</tr>
+<tr>
+<td align="center">tan(x)</td>
+<td>计算x正切值</td>
+</tr>
+<tr>
+<td align="center">sincos(float x, out s, out c)</td>
+<td>该函数是同时计算x的sin值和cos值，其中s=sin(x)，c=cos(x)。该函数用于“同时需要计算sin值和cos值的情况”，比分别运算要快很多!</td>
+</tr>
+<tr>
+<td align="center">sinh(x)</td>
+<td>计算x的双曲正弦</td>
+</tr>
+<tr>
+<td align="center">cosh(x)</td>
+<td>双曲余弦（hyperbolic cosine）函数，计算x的双曲余弦值。</td>
+</tr>
+<tr>
+<td align="center">tanh(x)</td>
+<td>计算x的双曲线切线</td>
+</tr>
+<tr>
+<td align="center">radians(x)</td>
+<td>函数将角度值转换为弧度值</td>
+</tr>
+<tr>
+<td align="center">degrees(x)</td>
+<td>输入参数为弧度值(radians)，函数将其转换为角度值(degrees)</td>
+</tr>
+<tr>
+<td align="center">cross(A,B)</td>
+<td>返回两个三元向量的叉积(cross product)。注意，输入参数必须是三元向量！</td>
+</tr>
+<tr>
+<td align="center">lit(NdotL, NdotH, m)</td>
+<td>函数计算环境光、散射光、镜面光的贡献，返回的4元向量。<br>N表示法向量；<br>L表示入射光向量；<br>H表示半角向量；<br>m表示高光系数。<br>X位表示环境光的贡献，总是1.0;<br>Y位代表散射光的贡献，如果 N∙L&lt;0，则为0；否则为N∙L<br>Z位代表镜面光的贡献，如果N∙L&lt;0 或者N∙H&lt;0，则位0；否则为(N∙L)m;<br>W位始终位1.0</td>
+</tr>
+<tr>
+<td align="center">all(x)</td>
+<td>如果输入参数均不为0，则返回ture； 否则返回flase。&amp;&amp;运算</td>
+</tr>
+<tr>
+<td align="center">any(x)</td>
+<td>输入参数只要有其中一个不为0，则返回true。</td>
+</tr>
+<tr>
+<td align="center">isfinite(x)</td>
+<td>判断标量或者向量中的每个数据是否是有限数，如果是返回true；否则返回false;</td>
+</tr>
+<tr>
+<td align="center">isinf(x)</td>
+<td>判断标量或者向量中的每个数据是否是无限，如果是返回true；否则返回false;</td>
+</tr>
+<tr>
+<td align="center">isnan(x)</td>
+<td>判断标量或者向量中的每个数据是否是非数据(not-a-number NaN)，如果是返回true；否则返回false;</td>
+</tr>
+<tr>
+<td align="center">step(a, x)</td>
+<td>如果x&lt;a, 返回0；否则返回1</td>
+</tr>
+<tr>
+<td align="center">sign(x)</td>
+<td>如果x&gt;0则返回1；如果x=0返回0；如果x&lt;0则返回-1</td>
+</tr>
+<tr>
+<td align="center">dot(A,B)</td>
+<td>返回A和B的点积(dot product)。参数A和B可以是标量，也可以是向量（输入参数方面，点积和叉积函数有很大不同）</td>
+</tr>
+<tr>
+<td align="center">noise(x)</td>
+<td>根据它的参数类型，这个函数可以是一元、二元或三元噪音函数。返回的值在0和1之间，并且通常与给定的输入值一样</td>
+</tr>
+<tr>
+<td align="center">clamp(x,a,b)</td>
+<td>如果x值小于a，则返回a；<br>如果x值大于b，返回b；<br>否则，返回x。</td>
+</tr>
+<tr>
+<td align="center">lerp(a, b, f)</td>
+<td>计算或者的值。即在下限a和上限b之间进行插值，f表示权值。注意，如果a和b是向量，则权值f必须是标量或者等长的向量。</td>
+</tr>
+<tr>
+<td align="center">saturate(x)</td>
+<td>把x限制到[0,1]之间</td>
+</tr>
+<tr>
+<td align="center">smoothstep(min, max, x)</td>
+<td>值x位于min、max区间中。<br>如果x=min，返回0；如果x=max，返回1；<br>如果x在两者之间，按照下列公式返回数据：$-2 * ((x-min)/(max-min))^3 + 3 * ((x-min)*(max-min))^2 $
+</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://ogazen.github.io">Gazen的个人博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","oGazen/ogazen.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+<script>MathJax = {tex: {inlineMath: [["$", "$"]]}};</script><script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</html>
