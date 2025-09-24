@@ -1,7 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen的个人博客</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen的个人博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Mon, 22 Sep 2025 09:06:05 +0000</lastBuildDate><managingEditor>Gazen的个人博客</managingEditor><ttl>60</ttl><webMaster>Gazen的个人博客</webMaster><item><title>ShaderLab 数学函数</title><link>https://ogazen.github.io/post/ShaderLab%20-shu-xue-han-shu.html</link><description>## ShaderLab 数学函数
-
-### 修饰符
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen的个人博客</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen的个人博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Wed, 24 Sep 2025 01:56:54 +0000</lastBuildDate><managingEditor>Gazen的个人博客</managingEditor><ttl>60</ttl><webMaster>Gazen的个人博客</webMaster><item><title>ShaderLab 数学函数</title><link>https://ogazen.github.io/post/ShaderLab%20-shu-xue-han-shu.html</link><description>### 修饰符
 
 | **修饰符** | **解析**                                                     |
 | :--------: | :----------------------------------------------------------- |
