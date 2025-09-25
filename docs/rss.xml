@@ -1,5 +1,289 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen的个人博客</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen的个人博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Wed, 24 Sep 2025 01:56:54 +0000</lastBuildDate><managingEditor>Gazen的个人博客</managingEditor><ttl>60</ttl><webMaster>Gazen的个人博客</webMaster><item><title>ShaderLab 数学函数</title><link>https://ogazen.github.io/post/ShaderLab%20-shu-xue-han-shu.html</link><description>### 修饰符
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen的个人博客</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen的个人博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Thu, 25 Sep 2025 07:54:14 +0000</lastBuildDate><managingEditor>Gazen的个人博客</managingEditor><ttl>60</ttl><webMaster>Gazen的个人博客</webMaster><item><title>模拟平面水（Beta）</title><link>https://ogazen.github.io/post/mo-ni-ping-mian-shui-%EF%BC%88Beta%EF%BC%89.html</link><description>### 平面水shader
+
+&lt;details open&gt;
+    &lt;summary&gt;WaterPanel&lt;/summary&gt;
+
+```hlsl
+Shader 'URP/WaterPanel'
+{
+    Properties
+    {
+        [MainTexture]_MainTex ('Texture', 2D) = 'white' {}
+        [MainColor]_Color ('Color',Color) = (1,1,1,1)
+
+        // 第一步
+        [Header(Depth And Color)]
+        [Space()]
+        _DepthIntensity ('Depth Intensity',Range(0,1)) = 0.05
+        _EdgeColor ('Edge Color',Color) = (1,1,1,1)
+        _WaterColor ('Water Color',Color) = (1,1,1,1)
+
+        // 第二步 法线贴图
+        [Header(Normal Texture)]
+        [Space()]
+        _NormalTex('Normal Texture',2D) = 'white' {}
+        _FlowSpeed('Flow Speed',Float) = 1
+        _NormalMixture('Normal Mixture',Float) = 1
+
+
+        // 第三步 高光
+        [Header(Specular Color)]
+        [Space()]
+        _SpecularColor('Specular Color',Color)=(1,1,1,1)
+        _SpecularIntensity('Specular Intensity',float)=1
+        _Shininess('Shininess',float)=1
+
+
+        // 第四步 反射 CubeMap
+        [Header(Reflect Texture)]
+        [Space()]
+        _ReflectTex2('ReflectTex2',2D) = 'white' {}
+        _ReflectMixture('Reflect Mixture',float)=1
+        _FresnelIntensity('Fresnel Intensity',float)=1
+
+
+
+        // 第五步 水下折射扭曲
+        [Header(Distort Texture)]
+        [Space()]
+        _DistortTex('DistortTex',2D) = 'white'{}
+        _Refract_X('Refract_X',float)=1
+        _Refract_Y('Refract_Y',float)=1
+        _DistortIntensity('Distort Intensity',float)=0 //折射纹理的扭曲强度
+
+
+        // 第六步 水下焦散
+        [Header(Caustic Texture)]
+        [Space()]
+        _CausticTex('CausticTex',2D)='white'{}
+        _OffsetY('Caustic OffsetY',float)=1
+        _CausticIntensity('Caustic Intensity',float)=1
+
+
+        // 第七步 水面泡沫
+        [Header(Foam Texture)]
+        [Space()]
+        _FoamTex('FoamTex',2D)='white'{}
+        _FoamColor('Foam Color',Color)=(1,1,1,1)
+        _FoamNoise('FoamNoise',float)=1
+        _FoamMultiplier('Foam Multiplier',Float) = 1
+    }
+    SubShader
+    {
+        Tags
+        {
+            'RenderType'='Transparent'
+            'RenderPipeline'='UniversalRenderPipeline'
+            'IgnoreProjector'='true'
+            'Queue'='Transparent' // Transparent AlphaTest Geometry Background
+        }
+        LOD 100
+
+        Pass
+        {
+            HLSLPROGRAM
+
+
+            #include 'Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl'
+            #include 'Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl'
+            // #include 'Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl'
+            // #include 'Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl'
+
+            #pragma vertex Vert
+            #pragma fragment Frag
+
+
+
+            TEXTURE2D_X(_MainTex);
+            TEXTURE2D_X(_NormalTex);
+            TEXTURE2D_X(_ReflectTex2);
+            TEXTURE2D_X(_DistortTex);
+            TEXTURE2D_X(_CausticTex);
+            TEXTURE2D_X(_FoamTex);
+
+            TEXTURE2D_X(_CameraDepthTexture);
+            TEXTURE2D_X(_CameraOpaqueTexture);
+            SAMPLER(sampler_MainTex);
+
+            CBUFFER_START(UnityPerMaterial)
+            half4 _Color;
+            half4 _MainTex_ST;
+
+            // 第一步
+            half _DepthIntensity;
+            half4 _EdgeColor;
+            half4 _WaterColor;
+
+            // 第二步
+            half4 _NormalTex_ST;
+            half _FlowSpeed;
+            half _NormalMixture;
+
+            // 第三步
+            half4 _SpecularColor;
+            half _SpecularIntensity;
+            half _Shininess;
+
+            // 第四步
+            half _ReflectMixture;
+            half _FresnelIntensity;
+            half4 _ReflectTex2_ST;
+
+
+            // 第五步
+            half4 _DistortTex_ST;
+            half _Refract_X;
+            half _Refract_Y;
+            half _DistortIntensity;
+
+
+            // 第六步
+            half4 _CausticTex_ST;
+            half _OffsetY;
+            half _CausticIntensity;
+
+
+            // 第七步
+            half4 _FoamTex_ST;
+            half4 _FoamColor;
+            half _FoamNoise;
+            half _FoamMultiplier;
+            CBUFFER_END
+
+
+            struct Attributes
+            {
+                half4 position : POSITION;
+                half2 uv : TEXCOORD0;
+
+                // 第二步
+                half4 normalUV : TEXCOORD1;
+                half3 normal : NORMAL;
+            };
+
+
+            struct Varyings
+            {
+                half4 positionHCS : SV_POSITION;
+                half2 uv : TEXCOORD0;
+
+                // 第一步
+                half3 positionView : TEXCOORD1;
+                half3 positionWorld : TEXCOORD2;
+
+
+                // 第二步
+                half4 normalUV : TEXCOORD3;
+                half3 normalWorld : TEXCOORD4;
+
+                // 补丁
+                half4 screenPos : TEXCOORD5;
+            };
+
+
+            Varyings Vert(Attributes IN)
+            {
+                Varyings OUT;
+                // 第一步
+                OUT.positionHCS = TransformObjectToHClip(IN.position);
+                OUT.positionWorld = TransformObjectToWorld(IN.position);
+                OUT.positionView = TransformWorldToView(OUT.positionWorld);
+
+                // 第二步
+                OUT.normalWorld = TransformObjectToWorldNormal(IN.normal);
+                const half2 _mul1 = half2(1,1);
+                const half2 _mul2 = half2(-1.15,0.8);
+                OUT.normalUV.xy = TRANSFORM_TEX(IN.normalUV,_NormalTex) + _Time.y * _FlowSpeed * _mul1;
+                OUT.normalUV.zw = TRANSFORM_TEX(IN.normalUV,_NormalTex) + _Time.y * _FlowSpeed * _mul2;
+                OUT.uv = TRANSFORM_TEX(IN.uv,_FoamTex) + _Time.y * _FlowSpeed;
+
+                // 补丁
+                OUT.screenPos = ComputeScreenPos(OUT.positionHCS);
+
+                return OUT;
+            }
+
+
+
+            half4 Frag(Varyings IN) : SV_Target
+            {
+                /* 第一步 */
+                //根据深度差设置水面颜色
+                half2 ScreenUV = IN.positionHCS.xy / _ScreenParams.xy; //屏幕UV
+                half4 depthTex = SAMPLE_TEXTURE2D(_CameraDepthTexture,sampler_MainTex,ScreenUV); //采样深度图
+                half depth_eye = LinearEyeDepth(depthTex,_ZBufferParams); //将深度纹理的深度值转换到视图空间
+                //（此时水体面片不渲染到深度图中）用深度图中的深度值与水体面片的在视图空间的深度值做差值，两者交接处颜色为0
+                half depth_eye_viewZ = depth_eye + IN.positionView.z; //i.positionVS.z为负值，做差值时需两者相加
+                //_depthIntensity用于调节深度差变化
+                half depthDifference = saturate( depth_eye_viewZ * _DepthIntensity ); 
+                //水面颜色
+                half4 col = lerp(_EdgeColor,_WaterColor,depthDifference);
+                // return col;
+
+
+
+                /* 第二步 */
+                //水面法线
+                //利用两个流动不同方向的normalUV来采样法线纹理，最后将两者混合，做出水面流动的效果
+                half4 NormalTex01 = SAMPLE_TEXTURE2D(_NormalTex,sampler_MainTex,IN.normalUV.xy);
+                half4 NormalTex02 = SAMPLE_TEXTURE2D(_NormalTex,sampler_MainTex,IN.normalUV.zw);
+                half4 normalCalc = NormalTex01 * NormalTex02;
+                // return col + normalCalc;
+
+
+                /* 第三步 */
+                //水面高光
+                //利用_NormalMixture来混合模型本身法线和法线纹理
+                half3 N = normalize(lerp(IN.normalWorld,normalCalc,_NormalMixture));
+                Light light = GetMainLight();
+                half3 L = light.direction; // 看向灯光方向
+                half3 V = normalize(_WorldSpaceCameraPos - IN.positionWorld); // 看向摄像机
+                half3 H = normalize(L+V); // L 和 V 的中间向量
+                half4 Specular = _SpecularColor * _SpecularIntensity * pow(max(0,dot(N,H)),_Shininess);
+                // return Specular + col;
+
+
+
+                /* 第四步 */
+                //水面反射以及菲尼尔
+                //利用_ReflectMixture来控制法线取值，与上一步制作高光的法线值区分
+                half3 N1 = normalize( lerp(IN.normalWorld,normalCalc,_ReflectMixture) );
+                // 通过Schlick近似菲涅尔函数权重取折射和反射采样 空气折射率1 水折射率1.333
+                half Fresnel2 = pow(1 - saturate(dot(V, N1)), _FresnelIntensity);
+                // return ReflectTex2;
+
+
+
+                /* 第五步 */
+                //水下的折射扭曲
+                //利用水体面片的世界空间下坐标采样用于扭曲水下的纹理
+                half3 DistortTex = UnpackNormal(SAMPLE_TEXTURE2D(_DistortTex,sampler_MainTex,IN.positionWorld.xz * half2(_Refract_X,_Refract_Y)+_Time.y));
+                //偏移值 _DistortIntensity为扭曲强度值
+                half2 offset = DistortTex.xy * _DistortIntensity;
+                //扭曲UV值
+                half2 DistortUV = ScreenUV + offset; 
+                //利用扭曲后的屏幕UV采样深度图
+                half DistortDepth = SAMPLE_TEXTURE2D(_CameraDepthTexture,sampler_MainTex,DistortUV);
+                //将深度图中的深度信息转换到视图空间
+                DistortDepth = LinearEyeDepth(DistortDepth,_ZBufferParams);
+                //计算深度图和水体面片在视图空间中的深度差（i.positionVS.z为负值，所以两者要相加）
+                half DistDepthDifferent = saturate(DistortDepth + IN.positionView.z);
+                //消除水面以上物体的扭曲，因为水面以上物体的深度值小于i.positionVS.z,所以DistDepthDifferent值为负时，使水面以上物体采样屏幕纹理的UV为屏幕UV(不进行扭曲)
+                if(!all(DistDepthDifferent)) DistortUV = ScreenUV;
+                //最后利用上面计算得到的UV来采样屏幕纹理
+                half4 RefractTex = SAMPLE_TEXTURE2D(_CameraOpaqueTexture,sampler_MainTex,DistortUV);
+                half4 ReflectTex2 = SAMPLE_TEXTURE2D(_ReflectTex2,sampler_MainTex,DistortUV);
+                half4 refract_reflect = ReflectTex2 * Fresnel2 + RefractTex * (1-Fresnel2);
+
+
+
+
+
+
+                /* 第六步 */
+                //水下的焦散
+                //因为焦散纹理需要处于水底，而我们只能使用水体面片来采样焦散纹理。</description><guid isPermaLink="true">https://ogazen.github.io/post/mo-ni-ping-mian-shui-%EF%BC%88Beta%EF%BC%89.html</guid><pubDate>Thu, 25 Sep 2025 07:53:35 +0000</pubDate></item><item><title>ShaderLab 数学函数</title><link>https://ogazen.github.io/post/ShaderLab%20-shu-xue-han-shu.html</link><description>### 修饰符
 
 | **修饰符** | **解析**                                                     |
 | :--------: | :----------------------------------------------------------- |
