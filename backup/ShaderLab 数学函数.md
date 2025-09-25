@@ -67,3 +67,6 @@
 |         lerp(a, b, f)         | 计算或者的值。即在下限a和上限b之间进行插值，f表示权值。注意，如果a和b是向量，则权值f必须是标量或者等长的向量。 |
 |          saturate(x)          | 把x限制到[0,1]之间                                           |
 |    smoothstep(min, max, x)    | 值x位于min、max区间中。<br/>如果x=min，返回0；如果x=max，返回1；<br/>如果x在两者之间，按照下列公式返回数据：$`-2 * ((x-min)/(max-min))^3 + 3 * ((x-min)*(max-min))^2 `$ |
+
+#### 参考链接
+1. [UnityShader常用函数](https://blog.csdn.net/u012722551/article/details/103926660)
