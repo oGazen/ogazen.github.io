@@ -15,7 +15,57 @@
   <div id = 'vditor'></div>
 </div>
 <script>
-   new Vditor('vditor')
+  let toolbar = [
+    "emoji",
+    "headings",
+    "bold",
+    "italic",
+    "strike",
+    "link",
+    "|",
+    "list",
+    "ordered-list",
+    "check",
+    "outdent",
+    "indent",
+    "|",
+    "quote",
+    "line",
+    "code",
+    "inline-code",
+    "insert-before",
+    "insert-after",
+    "|",
+    // "upload",
+    // "record",
+    "table",
+    "|",
+    "undo",
+    "redo",
+    "|",
+    "edit-mode",
+    // "content-theme",
+    "code-theme",
+    // "export",
+    "fullscreen",
+    {
+      name: "more",
+      toolbar: [
+        "both",
+        "preview",
+        "info",
+        "help",
+      ],
+    }]
+  
+  
+    new Vditor('vditor', {
+      toolbar,
+      placeholder: "Hello, Vditor!",
+      height: window.innerHeight + 100,
+      tab: "\t",
+    })
+  
 </script>
 </body>
 </html>
