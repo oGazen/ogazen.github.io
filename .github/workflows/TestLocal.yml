@@ -1,0 +1,64 @@
+name: build Test Gmeek
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  build:
+    name: Generate blog
+    runs-on: ubuntu-24.04
+    if: ${{ github.event.repository.owner.id == github.event.sender.id }}
+    permissions: write-all
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
+
+      - name: Get config.json
+        run: |
+          echo "====== check config.json file ======"
+          cat config.json
+          echo "====== check config.json end  ======"
+          sudo apt-get install jq
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+
+      - name: Clone source code
+        run: |
+         GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
+         git clone https://kkgithub.com/oGazen/DoGmeek.git /opt/Gmeek;
+         cd /opt/Gmeek/
+
+      - name: Install dependencies
+        run: |
+         sudo apt install python3-venv
+         python3 -m venv myenv
+         source myenv/bin/activate
+         pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+         pip install -r /opt/Gmeek/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+         deactivate
+
+      - name: Generate new html
+        run: |
+         cp -r ./* /opt/Gmeek/
+         cd /opt/Gmeek/
+         echo `pwd` ${{github.repository.name}}
+         source ../../mnt/d/ProjectAll/Project-Git/ogazen.github.io/myenv/bin/activate
+         python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
+         cp -a /opt/Gmeek/docs ${{ github.workspace }} 
+         cp -a /opt/Gmeek/backup ${{ github.workspace }} 
+         cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
+         deactivate
+          
+
+      - name: Clear and Back
+        run: |
+          echo `pwd`
+          rm -rf myenv
+          read -p "Press enter key to continue..."
+
+          
