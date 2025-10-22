@@ -3,19 +3,19 @@
 1. Unity国际 [NoUnityCN | Unity国际版下载站 - 让游戏开发更加简单](https://www.nounitycn.top/)
 2. Wampserver64 [Download Wampserver 64bits - WampServer](https://www.wampserver.com/)
 3. TeamViewer [TeamViewer——数字化工作场所平台](https://www.teamviewer.cn/cn/)
-4. jadx [skylot/jadx: Dex to Java decompiler](https://github.com/skylot/jadx)
+4. Jadx [skylot/jadx: Dex to Java decompiler](https://github.com/skylot/jadx)
 5. Docker [Docker: Accelerated Container Application Development](https://www.docker.com/)
 6. AndroidStudio [Android Studio download archives  |  Android Developers](https://developer.android.google.cn/studio/archive?hl=en)
 7. Rider [Rider: The Cross-Platform .NET IDE from JetBrains](https://www.jetbrains.com/rider/)
-8. vscode [Download Visual Studio Code - Mac, Linux, Windows](https://code.visualstudio.com/download)
-9. visual studio [Visual Studio: 适用于软件开发的 IDE 和代码编辑器](https://visualstudio.microsoft.com/zh-hans/)
-10. notePad++ [Notepad++ Official Website - Free Open Source Text Editor Download](http://www.notepadplus.com.cn/en/)
+8. VScode [Download Visual Studio Code - Mac, Linux, Windows](https://code.visualstudio.com/download)
+9. Visual Studio [Visual Studio: 适用于软件开发的 IDE 和代码编辑器](https://visualstudio.microsoft.com/zh-hans/)
+10. NotePad++ [Notepad++ Official Website - Free Open Source Text Editor Download](http://www.notepadplus.com.cn/en/)
 11. WSL2 [Manual installation steps for older versions of WSL | Microsoft Learn](https://learn.microsoft.com/en-us/windows/wsl/install-manual)
 12. MuMu模拟器 [Mumu模拟器4.1.25+5.1.3去广告整合包](https://www.52pojie.cn/thread-2030503-1-1.html)
 
 #### 环境
 
-1. nodejs [Node.js — Run JavaScript Everywhere](https://nodejs.org/zh-cn)
+1. Nodejs [Node.js — Run JavaScript Everywhere](https://nodejs.org/zh-cn)
    
    * [Node.js 下载安装与环境配置全流程（保姆级详解）| 图文详解，快速上手\_node安装教程图文详解-CSDN博客](https://blog.csdn.net/Natsuago/article/details/145567734)
 2. python [Python.org - Python 编程语言](https://pythonlang.cn/)
@@ -37,7 +37,7 @@
 6. ILspy[icsharpcode/ILSpy: .NET Decompiler with support for PDB generation, ReadyToRun, Metadata (&more) - cross-platform!](https://github.com/icsharpcode/ILSpy)
 7. PotPlayer [Download PotPlayer - Free multimedia player](https://potplayer.info/download/)
 8. SQLite Personal [SQLite administration | SQLite Expert](https://www.sqliteexpert.com/download.html)
-9. IPX [Download - PIX on Windows](https://devblogs.microsoft.com/pix/download/)
+9. PIX [Download - PIX on Windows](https://devblogs.microsoft.com/pix/download/)
 10. DirectXRepair
 11. Internet Download Manager
 12. BandiZip
