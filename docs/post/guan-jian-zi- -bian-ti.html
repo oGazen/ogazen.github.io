@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/68213482?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="#### 最常用引入(URP)
+
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTextue.hlsl
+* Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl
+
+#### 着色器变体/剥离(Build-In)
+
+[使用快捷键创建关键字集 ](https://docs.unity3d.com/2022.3/Documentation/Manual/SL-MultipleProgramVariants-shortcuts.html)
+
+| Shortcut                               | Shader keywords Unity adds                                                                                                                                                                                                          | Unity adds a variant with all the keywords off | Shader pass that uses the variants                                                                                                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `multi_compile_fog`                | `FOG_LINEAR`, `FOG_EXP`, `FOG_EXP2`                                                                                                                                                                                     | Yes                                            | Fog                                                                                                                                                                             |
+| `multi_compile_fwdadd`             | `POINT` `DIRECTIONAL` `SPOT` `POINT_COOKIE` `DIRECTIONAL_COOKIE`                                                                                                                                                | No                                             | PassType.ForwardAdd                                                             |
+| `multi_compile_fwdadd_fullshadows` | `POINT`, `DIRECTIONAL`, `SPOT`, `POINT_COOKIE`, `DIRECTIONAL_COOKIE`, `SHADOWS_DEPTH SHADOWS_SCREEN` `SHADOWS_CUBE SHADOWS_SOFT SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING`                       | No                                             | PassType.ForwardAdd|
+| `multi_compile_fwdbase`            | `DIRECTIONAL`, `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `SHADOWS_SCREEN`, `SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING`, `LIGHTPROBE_SH`                                       | No                                             | PassType.ForwardBase                                                              |
+| `multi_compile_fwdbasealpha`       | `DIRECTIONAL`, `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `LIGHTMAP_SHADOW_MIXING`, `VERTEXLIGHT_ON`, `LIGHTPROBE_SH`                                                                 | No                                             | PassType.ForwardBase                                                        |
+| `multi_compile_instancing`         | `INSTANCING_ON`. Also adds `PROCEDURAL_ON` if your project uses procedural instancing.                                                                                                                                      | Yes                                            | Instancing                                                                                                                                                                      |
+| `multi_compile_lightpass`          | `POINT`, `DIRECTIONAL`, `SPOT`, `POINT_COOKIE`, `DIRECTIONAL_COOKIE`, `SHADOWS_DEPTH`, `SHADOWS_SCREEN`, `SHADOWS_CUBE`, `SHADOWS_SOFT`, `SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING` | No                                             | All passes that draw real-time light and shadows, except **Light Probes**.                                                                                               |
+| `multi_compile_particles`          | `SOFTPARTICLES_ON`                                                                                                                                                                                                              | Yes                                            | Particle System passes.                                                                                                                                                       |
+| `multi_compile_prepassfinal`       | `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `UNITY_HDR_ON`, `SHADOWS_SHADOWMASK`, `LIGHTPROBE_SH`                                                                                          | Yes                                            | PassType.Deferredl                                         |
+| `multi_compile_shadowcaster`       | `SHADOWS_DEPTH`, `SHADOWS_CUBE`                                                                                                                                                                                             | No                                             | PassType.ShadowCaster                                                      |
+| `multi_compile_shadowcollector`    | `SHADOWS_SPLIT_SPHERES`, `SHADOWS_SINGLE_CASCADE`                                                                                                                                                                           | Yes                                            | Screen-space shadows.                                                                                                                                                           |
+
+##### 移除变体
+
+```hlsl
+#pragma multi_compile_fwdadd
+#pragma skip_variants POINT POINT_COOKIE
+```
+
+##### 指明着色器关键字阶段
+
+[着色器变体剥离 ](https://docs.unity3d.com/2022.3/Documentation/Manual/shader-variant-stripping.html)
+
+> 例：#pragma multi_compile_fragment 仅作用于fragment计算
+> 类似的还有
+> `_vertex`
+> `_fragment`
+> `_hull`
+> `_domain`
+> `_geometry`
+> `_raytracing`
+
+#### 着色器变体/剥离(URP)
+
+[Shader Stripping | Universal RP | 14.0.12](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@14.0/manual/shader-stripping.html)
+
+| **Feature**               | **How to disable the feature**                                                                                                                                                             | **Shader keywords this turns off**                                                                                                                                            | **Rendering Path** |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Accurate G-buffer normals       | Disable **Accurate G-buffer normals** in the URP Asset. This has no effect on platforms that use the Vulkan graphics API.                                                                  | `_GBUFFER_NORMALS_OCT`                                                                                                                                                          | Deferred                 |
+| Additional lights               | In the ​**URP Asset**​, in the ​**Lighting section**​, disable ​**Additional Lights**​.                                                                                  | `_ADDITIONAL_LIGHTS`, `_ADDITIONAL_LIGHTS_VERTEX`                                                                                                                           | Forward                  |
+| Ambient occlusion               | Remove the Ambient Occlusion Renderer Feature in all Renderers that URP Assets use. | `_SCREEN_SPACE_OCCLUSION`                                                                                                                                                       | Forward and Deferred     |
+| Decals                          | Remove the Decals Renderer Feature in all Renderers that URP Assets use.          | `_DBUFFER_MRT1`, `_DBUFFER_MRT2`, `_DBUFFER_MRT3`, `_DECAL_NORMAL_BLEND_LOW`, `_DECAL_NORMAL_BLEND_MEDIUM`, `_DECAL_NORMAL_BLEND_HIGH`, `_DECAL_LAYERS` | Forward and Deferred     |
+| Fast sRGB to linear conversion  | In the ​**URP Asset**​, in the **Post-processing** section, disable ​**Fast sRGB/Linear conversions**​.                                                                    | `_USE_FAST_SRGB_LINEAR_CONVERSION`                                                                                                                                              | Forward and Deferred     |
+| Holes in terrain                | In the ​**URP Asset**​, in the **Rendering** section, disable ​**Terrain Holes**​.                                                                                         | `_ALPHATEST_ON`                                                                                                                                                                 | Forward                  |
+| Light cookies                   | Remove Cookie textures from all the lights in your project.                                                                                         | `_LIGHT_COOKIES`                                                                                                                                                                | Forward and Deferred     |
+| Rendering Layers for lights     | Disable Rendering Layers for Lights       | `_LIGHT_LAYERS`                                                                                                                                                                 | Forward and Deferred     |
+| Reflection Probe blending       | Disable Probe Blending                | `_REFLECTION_PROBE_BLENDING`                                                                                                                                                    | Forward and Deferred     |
+| Reflection Probe box projection | Disable Box Projection              | `_REFLECTION_PROBE_BOX_PROJECTION`                                                                                                                                              | Forward and Deferred     |
+| Render Pass                     | Disable **Native Render** in all Renderers that URP Assets use.                                                                                                                            | `_RENDER_PASS_ENABLED`                                                                                                                                                          | Forward and Deferred     |
+| Shadows from additional lights  | In the URP Asset, in the **Additional Lights** section, disable ​**Cast Shadows**​.                                                                                                | `_ADDITIONAL_LIGHT_SHADOWS`                                                                                                                                                     | Forward and Deferred     |
+| Shadows from the main light     | In the URP Asset, in the **Main Light** section, disable ​**Cast Shadows**​. The keywords Unity removes might depend on your settings.                                             | `_MAIN_LIGHT_SHADOWS`, `_MAIN_LIGHT_SHADOWS_CASCADE`, `_MAIN_LIGHT_SHADOWS_SCREEN`                                                                                      | Forward and Deferred     |
+| Soft shadows                    | In the URP Asset, in the **Shadows** section, disable ​**Soft shadows**​.                                                                                                          | `_SHADOWS_SOFT`                                                                                                                                                                 | Forward and Deferred     |
+
+| **Volume Override removed** | **Shader keywords this turns off**                                   |
+| ----------------------------------- | ---------------------------------------------------------------------------- |
+| Bloom                             | `_BLOOM_HQ`, `BLOOM_HQ_DIRT`, `_BLOOM_LQ`, `BLOOM_LQ_DIRT` |
+| Chromatic Aberration              | `_CHROMATIC_ABERRATION`                                                |
+| Film Grain                        | `_FILM_GRAIN`                                                          |
+| HDR Grading                       | `_HDR_GRADING`                                                         |
+| Lens Distortion                   | `_DISTORTION`                                                          |
+| Tonemapping                       | `_TONEMAP_ACES`, `_TONEMAP_NEUTRAL`, `_TONEMAP_GRADING`        |
+。">
+<meta property="og:title" content="关键字 变体">
+<meta property="og:description" content="#### 最常用引入(URP)
+
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTextue.hlsl
+* Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl
+
+#### 着色器变体/剥离(Build-In)
+
+[使用快捷键创建关键字集 ](https://docs.unity3d.com/2022.3/Documentation/Manual/SL-MultipleProgramVariants-shortcuts.html)
+
+| Shortcut                               | Shader keywords Unity adds                                                                                                                                                                                                          | Unity adds a variant with all the keywords off | Shader pass that uses the variants                                                                                                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `multi_compile_fog`                | `FOG_LINEAR`, `FOG_EXP`, `FOG_EXP2`                                                                                                                                                                                     | Yes                                            | Fog                                                                                                                                                                             |
+| `multi_compile_fwdadd`             | `POINT` `DIRECTIONAL` `SPOT` `POINT_COOKIE` `DIRECTIONAL_COOKIE`                                                                                                                                                | No                                             | PassType.ForwardAdd                                                             |
+| `multi_compile_fwdadd_fullshadows` | `POINT`, `DIRECTIONAL`, `SPOT`, `POINT_COOKIE`, `DIRECTIONAL_COOKIE`, `SHADOWS_DEPTH SHADOWS_SCREEN` `SHADOWS_CUBE SHADOWS_SOFT SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING`                       | No                                             | PassType.ForwardAdd|
+| `multi_compile_fwdbase`            | `DIRECTIONAL`, `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `SHADOWS_SCREEN`, `SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING`, `LIGHTPROBE_SH`                                       | No                                             | PassType.ForwardBase                                                              |
+| `multi_compile_fwdbasealpha`       | `DIRECTIONAL`, `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `LIGHTMAP_SHADOW_MIXING`, `VERTEXLIGHT_ON`, `LIGHTPROBE_SH`                                                                 | No                                             | PassType.ForwardBase                                                        |
+| `multi_compile_instancing`         | `INSTANCING_ON`. Also adds `PROCEDURAL_ON` if your project uses procedural instancing.                                                                                                                                      | Yes                                            | Instancing                                                                                                                                                                      |
+| `multi_compile_lightpass`          | `POINT`, `DIRECTIONAL`, `SPOT`, `POINT_COOKIE`, `DIRECTIONAL_COOKIE`, `SHADOWS_DEPTH`, `SHADOWS_SCREEN`, `SHADOWS_CUBE`, `SHADOWS_SOFT`, `SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING` | No                                             | All passes that draw real-time light and shadows, except **Light Probes**.                                                                                               |
+| `multi_compile_particles`          | `SOFTPARTICLES_ON`                                                                                                                                                                                                              | Yes                                            | Particle System passes.                                                                                                                                                       |
+| `multi_compile_prepassfinal`       | `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `UNITY_HDR_ON`, `SHADOWS_SHADOWMASK`, `LIGHTPROBE_SH`                                                                                          | Yes                                            | PassType.Deferredl                                         |
+| `multi_compile_shadowcaster`       | `SHADOWS_DEPTH`, `SHADOWS_CUBE`                                                                                                                                                                                             | No                                             | PassType.ShadowCaster                                                      |
+| `multi_compile_shadowcollector`    | `SHADOWS_SPLIT_SPHERES`, `SHADOWS_SINGLE_CASCADE`                                                                                                                                                                           | Yes                                            | Screen-space shadows.                                                                                                                                                           |
+
+##### 移除变体
+
+```hlsl
+#pragma multi_compile_fwdadd
+#pragma skip_variants POINT POINT_COOKIE
+```
+
+##### 指明着色器关键字阶段
+
+[着色器变体剥离 ](https://docs.unity3d.com/2022.3/Documentation/Manual/shader-variant-stripping.html)
+
+> 例：#pragma multi_compile_fragment 仅作用于fragment计算
+> 类似的还有
+> `_vertex`
+> `_fragment`
+> `_hull`
+> `_domain`
+> `_geometry`
+> `_raytracing`
+
+#### 着色器变体/剥离(URP)
+
+[Shader Stripping | Universal RP | 14.0.12](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@14.0/manual/shader-stripping.html)
+
+| **Feature**               | **How to disable the feature**                                                                                                                                                             | **Shader keywords this turns off**                                                                                                                                            | **Rendering Path** |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Accurate G-buffer normals       | Disable **Accurate G-buffer normals** in the URP Asset. This has no effect on platforms that use the Vulkan graphics API.                                                                  | `_GBUFFER_NORMALS_OCT`                                                                                                                                                          | Deferred                 |
+| Additional lights               | In the ​**URP Asset**​, in the ​**Lighting section**​, disable ​**Additional Lights**​.                                                                                  | `_ADDITIONAL_LIGHTS`, `_ADDITIONAL_LIGHTS_VERTEX`                                                                                                                           | Forward                  |
+| Ambient occlusion               | Remove the Ambient Occlusion Renderer Feature in all Renderers that URP Assets use. | `_SCREEN_SPACE_OCCLUSION`                                                                                                                                                       | Forward and Deferred     |
+| Decals                          | Remove the Decals Renderer Feature in all Renderers that URP Assets use.          | `_DBUFFER_MRT1`, `_DBUFFER_MRT2`, `_DBUFFER_MRT3`, `_DECAL_NORMAL_BLEND_LOW`, `_DECAL_NORMAL_BLEND_MEDIUM`, `_DECAL_NORMAL_BLEND_HIGH`, `_DECAL_LAYERS` | Forward and Deferred     |
+| Fast sRGB to linear conversion  | In the ​**URP Asset**​, in the **Post-processing** section, disable ​**Fast sRGB/Linear conversions**​.                                                                    | `_USE_FAST_SRGB_LINEAR_CONVERSION`                                                                                                                                              | Forward and Deferred     |
+| Holes in terrain                | In the ​**URP Asset**​, in the **Rendering** section, disable ​**Terrain Holes**​.                                                                                         | `_ALPHATEST_ON`                                                                                                                                                                 | Forward                  |
+| Light cookies                   | Remove Cookie textures from all the lights in your project.                                                                                         | `_LIGHT_COOKIES`                                                                                                                                                                | Forward and Deferred     |
+| Rendering Layers for lights     | Disable Rendering Layers for Lights       | `_LIGHT_LAYERS`                                                                                                                                                                 | Forward and Deferred     |
+| Reflection Probe blending       | Disable Probe Blending                | `_REFLECTION_PROBE_BLENDING`                                                                                                                                                    | Forward and Deferred     |
+| Reflection Probe box projection | Disable Box Projection              | `_REFLECTION_PROBE_BOX_PROJECTION`                                                                                                                                              | Forward and Deferred     |
+| Render Pass                     | Disable **Native Render** in all Renderers that URP Assets use.                                                                                                                            | `_RENDER_PASS_ENABLED`                                                                                                                                                          | Forward and Deferred     |
+| Shadows from additional lights  | In the URP Asset, in the **Additional Lights** section, disable ​**Cast Shadows**​.                                                                                                | `_ADDITIONAL_LIGHT_SHADOWS`                                                                                                                                                     | Forward and Deferred     |
+| Shadows from the main light     | In the URP Asset, in the **Main Light** section, disable ​**Cast Shadows**​. The keywords Unity removes might depend on your settings.                                             | `_MAIN_LIGHT_SHADOWS`, `_MAIN_LIGHT_SHADOWS_CASCADE`, `_MAIN_LIGHT_SHADOWS_SCREEN`                                                                                      | Forward and Deferred     |
+| Soft shadows                    | In the URP Asset, in the **Shadows** section, disable ​**Soft shadows**​.                                                                                                          | `_SHADOWS_SOFT`                                                                                                                                                                 | Forward and Deferred     |
+
+| **Volume Override removed** | **Shader keywords this turns off**                                   |
+| ----------------------------------- | ---------------------------------------------------------------------------- |
+| Bloom                             | `_BLOOM_HQ`, `BLOOM_HQ_DIRT`, `_BLOOM_LQ`, `BLOOM_LQ_DIRT` |
+| Chromatic Aberration              | `_CHROMATIC_ABERRATION`                                                |
+| Film Grain                        | `_FILM_GRAIN`                                                          |
+| HDR Grading                       | `_HDR_GRADING`                                                         |
+| Lens Distortion                   | `_DISTORTION`                                                          |
+| Tonemapping                       | `_TONEMAP_ACES`, `_TONEMAP_NEUTRAL`, `_TONEMAP_GRADING`        |
+。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ogazen.github.io/post/guan-jian-zi-%20-bian-ti.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/68213482?v=4">
+<title>关键字 变体</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">关键字 变体</h1>
+<div class="title-right">
+    <a href="https://ogazen.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/oGazen/ogazen.github.io/issues/8" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h4>最常用引入(URP)</h4>
+<ul>
+<li>Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl</li>
+<li>Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl</li>
+<li>Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl</li>
+<li>Packages/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl</li>
+<li>Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl</li>
+<li>Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl</li>
+<li>Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTextue.hlsl</li>
+<li>Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl</li>
+</ul>
+<h4>着色器变体/剥离(Build-In)</h4>
+<p><a href="https://docs.unity3d.com/2022.3/Documentation/Manual/SL-MultipleProgramVariants-shortcuts.html" rel="nofollow">使用快捷键创建关键字集 </a></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Shader keywords Unity adds</th>
+<th>Unity adds a variant with all the keywords off</th>
+<th>Shader pass that uses the variants</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">multi_compile_fog</code></td>
+<td><code class="notranslate">FOG_LINEAR</code>, <code class="notranslate">FOG_EXP</code>, <code class="notranslate">FOG_EXP2</code></td>
+<td>Yes</td>
+<td>Fog</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_fwdadd</code></td>
+<td><code class="notranslate">POINT</code> <code class="notranslate">DIRECTIONAL</code> <code class="notranslate">SPOT</code> <code class="notranslate">POINT_COOKIE</code> <code class="notranslate">DIRECTIONAL_COOKIE</code></td>
+<td>No</td>
+<td>PassType.ForwardAdd</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_fwdadd_fullshadows</code></td>
+<td><code class="notranslate">POINT</code>, <code class="notranslate">DIRECTIONAL</code>, <code class="notranslate">SPOT</code>, <code class="notranslate">POINT_COOKIE</code>, <code class="notranslate">DIRECTIONAL_COOKIE</code>, <code class="notranslate">SHADOWS_DEPTH SHADOWS_SCREEN</code> <code class="notranslate">SHADOWS_CUBE SHADOWS_SOFT SHADOWS_SHADOWMASK</code>, <code class="notranslate">LIGHTMAP_SHADOW_MIXING</code></td>
+<td>No</td>
+<td>PassType.ForwardAdd</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_fwdbase</code></td>
+<td><code class="notranslate">DIRECTIONAL</code>, <code class="notranslate">LIGHTMAP_ON</code>, <code class="notranslate">DIRLIGHTMAP_COMBINED</code>, <code class="notranslate">DYNAMICLIGHTMAP_ON</code>, <code class="notranslate">SHADOWS_SCREEN</code>, <code class="notranslate">SHADOWS_SHADOWMASK</code>, <code class="notranslate">LIGHTMAP_SHADOW_MIXING</code>, <code class="notranslate">LIGHTPROBE_SH</code></td>
+<td>No</td>
+<td>PassType.ForwardBase</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_fwdbasealpha</code></td>
+<td><code class="notranslate">DIRECTIONAL</code>, <code class="notranslate">LIGHTMAP_ON</code>, <code class="notranslate">DIRLIGHTMAP_COMBINED</code>, <code class="notranslate">DYNAMICLIGHTMAP_ON</code>, <code class="notranslate">LIGHTMAP_SHADOW_MIXING</code>, <code class="notranslate">VERTEXLIGHT_ON</code>, <code class="notranslate">LIGHTPROBE_SH</code></td>
+<td>No</td>
+<td>PassType.ForwardBase</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_instancing</code></td>
+<td><code class="notranslate">INSTANCING_ON</code>. Also adds <code class="notranslate">PROCEDURAL_ON</code> if your project uses procedural instancing.</td>
+<td>Yes</td>
+<td>Instancing</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_lightpass</code></td>
+<td><code class="notranslate">POINT</code>, <code class="notranslate">DIRECTIONAL</code>, <code class="notranslate">SPOT</code>, <code class="notranslate">POINT_COOKIE</code>, <code class="notranslate">DIRECTIONAL_COOKIE</code>, <code class="notranslate">SHADOWS_DEPTH</code>, <code class="notranslate">SHADOWS_SCREEN</code>, <code class="notranslate">SHADOWS_CUBE</code>, <code class="notranslate">SHADOWS_SOFT</code>, <code class="notranslate">SHADOWS_SHADOWMASK</code>, <code class="notranslate">LIGHTMAP_SHADOW_MIXING</code></td>
+<td>No</td>
+<td>All passes that draw real-time light and shadows, except <strong>Light Probes</strong>.</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_particles</code></td>
+<td><code class="notranslate">SOFTPARTICLES_ON</code></td>
+<td>Yes</td>
+<td>Particle System passes.</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_prepassfinal</code></td>
+<td><code class="notranslate">LIGHTMAP_ON</code>, <code class="notranslate">DIRLIGHTMAP_COMBINED</code>, <code class="notranslate">DYNAMICLIGHTMAP_ON</code>, <code class="notranslate">UNITY_HDR_ON</code>, <code class="notranslate">SHADOWS_SHADOWMASK</code>, <code class="notranslate">LIGHTPROBE_SH</code></td>
+<td>Yes</td>
+<td>PassType.Deferredl</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_shadowcaster</code></td>
+<td><code class="notranslate">SHADOWS_DEPTH</code>, <code class="notranslate">SHADOWS_CUBE</code></td>
+<td>No</td>
+<td>PassType.ShadowCaster</td>
+</tr>
+<tr>
+<td><code class="notranslate">multi_compile_shadowcollector</code></td>
+<td><code class="notranslate">SHADOWS_SPLIT_SPHERES</code>, <code class="notranslate">SHADOWS_SINGLE_CASCADE</code></td>
+<td>Yes</td>
+<td>Screen-space shadows.</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h5>移除变体</h5>
+<div class="highlight highlight-source-hlsl"><pre class="notranslate"><span class="pl-k">#pragma</span> multi_compile_fwdadd
+<span class="pl-k">#pragma</span> skip_variants POINT POINT_COOKIE</pre></div>
+<h5>指明着色器关键字阶段</h5>
+<p><a href="https://docs.unity3d.com/2022.3/Documentation/Manual/shader-variant-stripping.html" rel="nofollow">着色器变体剥离 </a></p>
+<blockquote>
+<p>例：#pragma multi_compile_fragment 仅作用于fragment计算<br>
+类似的还有<br>
+<code class="notranslate">_vertex</code><br>
+<code class="notranslate">_fragment</code><br>
+<code class="notranslate">_hull</code><br>
+<code class="notranslate">_domain</code><br>
+<code class="notranslate">_geometry</code><br>
+<code class="notranslate">_raytracing</code></p>
+</blockquote>
+<h4>着色器变体/剥离(URP)</h4>
+<p><a href="https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@14.0/manual/shader-stripping.html" rel="nofollow">Shader Stripping | Universal RP | 14.0.12</a></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>Feature</strong></th>
+<th><strong>How to disable the feature</strong></th>
+<th><strong>Shader keywords this turns off</strong></th>
+<th><strong>Rendering Path</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accurate G-buffer normals</td>
+<td>Disable <strong>Accurate G-buffer normals</strong> in the URP Asset. This has no effect on platforms that use the Vulkan graphics API.</td>
+<td><code class="notranslate">_GBUFFER_NORMALS_OCT</code></td>
+<td>Deferred</td>
+</tr>
+<tr>
+<td>Additional lights</td>
+<td>In the ​<strong>URP Asset</strong>​, in the ​<strong>Lighting section</strong>​, disable ​<strong>Additional Lights</strong>​.</td>
+<td><code class="notranslate">_ADDITIONAL_LIGHTS</code>, <code class="notranslate">_ADDITIONAL_LIGHTS_VERTEX</code></td>
+<td>Forward</td>
+</tr>
+<tr>
+<td>Ambient occlusion</td>
+<td>Remove the Ambient Occlusion Renderer Feature in all Renderers that URP Assets use.</td>
+<td><code class="notranslate">_SCREEN_SPACE_OCCLUSION</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Decals</td>
+<td>Remove the Decals Renderer Feature in all Renderers that URP Assets use.</td>
+<td><code class="notranslate">_DBUFFER_MRT1</code>, <code class="notranslate">_DBUFFER_MRT2</code>, <code class="notranslate">_DBUFFER_MRT3</code>, <code class="notranslate">_DECAL_NORMAL_BLEND_LOW</code>, <code class="notranslate">_DECAL_NORMAL_BLEND_MEDIUM</code>, <code class="notranslate">_DECAL_NORMAL_BLEND_HIGH</code>, <code class="notranslate">_DECAL_LAYERS</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Fast sRGB to linear conversion</td>
+<td>In the ​<strong>URP Asset</strong>​, in the <strong>Post-processing</strong> section, disable ​<strong>Fast sRGB/Linear conversions</strong>​.</td>
+<td><code class="notranslate">_USE_FAST_SRGB_LINEAR_CONVERSION</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Holes in terrain</td>
+<td>In the ​<strong>URP Asset</strong>​, in the <strong>Rendering</strong> section, disable ​<strong>Terrain Holes</strong>​.</td>
+<td><code class="notranslate">_ALPHATEST_ON</code></td>
+<td>Forward</td>
+</tr>
+<tr>
+<td>Light cookies</td>
+<td>Remove Cookie textures from all the lights in your project.</td>
+<td><code class="notranslate">_LIGHT_COOKIES</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Rendering Layers for lights</td>
+<td>Disable Rendering Layers for Lights</td>
+<td><code class="notranslate">_LIGHT_LAYERS</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Reflection Probe blending</td>
+<td>Disable Probe Blending</td>
+<td><code class="notranslate">_REFLECTION_PROBE_BLENDING</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Reflection Probe box projection</td>
+<td>Disable Box Projection</td>
+<td><code class="notranslate">_REFLECTION_PROBE_BOX_PROJECTION</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Render Pass</td>
+<td>Disable <strong>Native Render</strong> in all Renderers that URP Assets use.</td>
+<td><code class="notranslate">_RENDER_PASS_ENABLED</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Shadows from additional lights</td>
+<td>In the URP Asset, in the <strong>Additional Lights</strong> section, disable ​<strong>Cast Shadows</strong>​.</td>
+<td><code class="notranslate">_ADDITIONAL_LIGHT_SHADOWS</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Shadows from the main light</td>
+<td>In the URP Asset, in the <strong>Main Light</strong> section, disable ​<strong>Cast Shadows</strong>​. The keywords Unity removes might depend on your settings.</td>
+<td><code class="notranslate">_MAIN_LIGHT_SHADOWS</code>, <code class="notranslate">_MAIN_LIGHT_SHADOWS_CASCADE</code>, <code class="notranslate">_MAIN_LIGHT_SHADOWS_SCREEN</code></td>
+<td>Forward and Deferred</td>
+</tr>
+<tr>
+<td>Soft shadows</td>
+<td>In the URP Asset, in the <strong>Shadows</strong> section, disable ​<strong>Soft shadows</strong>​.</td>
+<td><code class="notranslate">_SHADOWS_SOFT</code></td>
+<td>Forward and Deferred</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>Volume Override removed</strong></th>
+<th><strong>Shader keywords this turns off</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bloom</td>
+<td><code class="notranslate">_BLOOM_HQ</code>, <code class="notranslate">BLOOM_HQ_DIRT</code>, <code class="notranslate">_BLOOM_LQ</code>, <code class="notranslate">BLOOM_LQ_DIRT</code></td>
+</tr>
+<tr>
+<td>Chromatic Aberration</td>
+<td><code class="notranslate">_CHROMATIC_ABERRATION</code></td>
+</tr>
+<tr>
+<td>Film Grain</td>
+<td><code class="notranslate">_FILM_GRAIN</code></td>
+</tr>
+<tr>
+<td>HDR Grading</td>
+<td><code class="notranslate">_HDR_GRADING</code></td>
+</tr>
+<tr>
+<td>Lens Distortion</td>
+<td><code class="notranslate">_DISTORTION</code></td>
+</tr>
+<tr>
+<td>Tonemapping</td>
+<td><code class="notranslate">_TONEMAP_ACES</code>, <code class="notranslate">_TONEMAP_NEUTRAL</code>, <code class="notranslate">_TONEMAP_GRADING</code></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://ogazen.github.io">Gazen's Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","oGazen/ogazen.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>

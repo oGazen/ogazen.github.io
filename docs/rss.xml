@@ -1,5 +1,83 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Fri, 07 Nov 2025 06:28:10 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>URP Shader常用函数</title><link>https://ogazen.github.io/post/URP%20Shader-chang-yong-han-shu.html</link><description>[URP 文档](https://docs.unity.cn/cn/Packages-cn/com.unity.render-pipelines.universal@14.1/manual/)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Fri, 07 Nov 2025 08:34:11 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>关键字 变体</title><link>https://ogazen.github.io/post/guan-jian-zi-%20-bian-ti.html</link><description>#### 最常用引入(URP)
+
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl
+* Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl
+* Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTextue.hlsl
+* Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl
+
+#### 着色器变体/剥离(Build-In)
+
+[使用快捷键创建关键字集 ](https://docs.unity3d.com/2022.3/Documentation/Manual/SL-MultipleProgramVariants-shortcuts.html)
+
+| Shortcut                               | Shader keywords Unity adds                                                                                                                                                                                                          | Unity adds a variant with all the keywords off | Shader pass that uses the variants                                                                                                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `multi_compile_fog`                | `FOG_LINEAR`, `FOG_EXP`, `FOG_EXP2`                                                                                                                                                                                     | Yes                                            | Fog                                                                                                                                                                             |
+| `multi_compile_fwdadd`             | `POINT` `DIRECTIONAL` `SPOT` `POINT_COOKIE` `DIRECTIONAL_COOKIE`                                                                                                                                                | No                                             | PassType.ForwardAdd                                                             |
+| `multi_compile_fwdadd_fullshadows` | `POINT`, `DIRECTIONAL`, `SPOT`, `POINT_COOKIE`, `DIRECTIONAL_COOKIE`, `SHADOWS_DEPTH SHADOWS_SCREEN` `SHADOWS_CUBE SHADOWS_SOFT SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING`                       | No                                             | PassType.ForwardAdd|
+| `multi_compile_fwdbase`            | `DIRECTIONAL`, `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `SHADOWS_SCREEN`, `SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING`, `LIGHTPROBE_SH`                                       | No                                             | PassType.ForwardBase                                                              |
+| `multi_compile_fwdbasealpha`       | `DIRECTIONAL`, `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `LIGHTMAP_SHADOW_MIXING`, `VERTEXLIGHT_ON`, `LIGHTPROBE_SH`                                                                 | No                                             | PassType.ForwardBase                                                        |
+| `multi_compile_instancing`         | `INSTANCING_ON`. Also adds `PROCEDURAL_ON` if your project uses procedural instancing.                                                                                                                                      | Yes                                            | Instancing                                                                                                                                                                      |
+| `multi_compile_lightpass`          | `POINT`, `DIRECTIONAL`, `SPOT`, `POINT_COOKIE`, `DIRECTIONAL_COOKIE`, `SHADOWS_DEPTH`, `SHADOWS_SCREEN`, `SHADOWS_CUBE`, `SHADOWS_SOFT`, `SHADOWS_SHADOWMASK`, `LIGHTMAP_SHADOW_MIXING` | No                                             | All passes that draw real-time light and shadows, except **Light Probes**.                                                                                               |
+| `multi_compile_particles`          | `SOFTPARTICLES_ON`                                                                                                                                                                                                              | Yes                                            | Particle System passes.                                                                                                                                                       |
+| `multi_compile_prepassfinal`       | `LIGHTMAP_ON`, `DIRLIGHTMAP_COMBINED`, `DYNAMICLIGHTMAP_ON`, `UNITY_HDR_ON`, `SHADOWS_SHADOWMASK`, `LIGHTPROBE_SH`                                                                                          | Yes                                            | PassType.Deferredl                                         |
+| `multi_compile_shadowcaster`       | `SHADOWS_DEPTH`, `SHADOWS_CUBE`                                                                                                                                                                                             | No                                             | PassType.ShadowCaster                                                      |
+| `multi_compile_shadowcollector`    | `SHADOWS_SPLIT_SPHERES`, `SHADOWS_SINGLE_CASCADE`                                                                                                                                                                           | Yes                                            | Screen-space shadows.                                                                                                                                                           |
+
+##### 移除变体
+
+```hlsl
+#pragma multi_compile_fwdadd
+#pragma skip_variants POINT POINT_COOKIE
+```
+
+##### 指明着色器关键字阶段
+
+[着色器变体剥离 ](https://docs.unity3d.com/2022.3/Documentation/Manual/shader-variant-stripping.html)
+
+&gt; 例：#pragma multi_compile_fragment 仅作用于fragment计算
+&gt; 类似的还有
+&gt; `_vertex`
+&gt; `_fragment`
+&gt; `_hull`
+&gt; `_domain`
+&gt; `_geometry`
+&gt; `_raytracing`
+
+#### 着色器变体/剥离(URP)
+
+[Shader Stripping | Universal RP | 14.0.12](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@14.0/manual/shader-stripping.html)
+
+| **Feature**               | **How to disable the feature**                                                                                                                                                             | **Shader keywords this turns off**                                                                                                                                            | **Rendering Path** |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Accurate G-buffer normals       | Disable **Accurate G-buffer normals** in the URP Asset. This has no effect on platforms that use the Vulkan graphics API.                                                                  | `_GBUFFER_NORMALS_OCT`                                                                                                                                                          | Deferred                 |
+| Additional lights               | In the ​**URP Asset**​, in the ​**Lighting section**​, disable ​**Additional Lights**​.                                                                                  | `_ADDITIONAL_LIGHTS`, `_ADDITIONAL_LIGHTS_VERTEX`                                                                                                                           | Forward                  |
+| Ambient occlusion               | Remove the Ambient Occlusion Renderer Feature in all Renderers that URP Assets use. | `_SCREEN_SPACE_OCCLUSION`                                                                                                                                                       | Forward and Deferred     |
+| Decals                          | Remove the Decals Renderer Feature in all Renderers that URP Assets use.          | `_DBUFFER_MRT1`, `_DBUFFER_MRT2`, `_DBUFFER_MRT3`, `_DECAL_NORMAL_BLEND_LOW`, `_DECAL_NORMAL_BLEND_MEDIUM`, `_DECAL_NORMAL_BLEND_HIGH`, `_DECAL_LAYERS` | Forward and Deferred     |
+| Fast sRGB to linear conversion  | In the ​**URP Asset**​, in the **Post-processing** section, disable ​**Fast sRGB/Linear conversions**​.                                                                    | `_USE_FAST_SRGB_LINEAR_CONVERSION`                                                                                                                                              | Forward and Deferred     |
+| Holes in terrain                | In the ​**URP Asset**​, in the **Rendering** section, disable ​**Terrain Holes**​.                                                                                         | `_ALPHATEST_ON`                                                                                                                                                                 | Forward                  |
+| Light cookies                   | Remove Cookie textures from all the lights in your project.                                                                                         | `_LIGHT_COOKIES`                                                                                                                                                                | Forward and Deferred     |
+| Rendering Layers for lights     | Disable Rendering Layers for Lights       | `_LIGHT_LAYERS`                                                                                                                                                                 | Forward and Deferred     |
+| Reflection Probe blending       | Disable Probe Blending                | `_REFLECTION_PROBE_BLENDING`                                                                                                                                                    | Forward and Deferred     |
+| Reflection Probe box projection | Disable Box Projection              | `_REFLECTION_PROBE_BOX_PROJECTION`                                                                                                                                              | Forward and Deferred     |
+| Render Pass                     | Disable **Native Render** in all Renderers that URP Assets use.                                                                                                                            | `_RENDER_PASS_ENABLED`                                                                                                                                                          | Forward and Deferred     |
+| Shadows from additional lights  | In the URP Asset, in the **Additional Lights** section, disable ​**Cast Shadows**​.                                                                                                | `_ADDITIONAL_LIGHT_SHADOWS`                                                                                                                                                     | Forward and Deferred     |
+| Shadows from the main light     | In the URP Asset, in the **Main Light** section, disable ​**Cast Shadows**​. The keywords Unity removes might depend on your settings.                                             | `_MAIN_LIGHT_SHADOWS`, `_MAIN_LIGHT_SHADOWS_CASCADE`, `_MAIN_LIGHT_SHADOWS_SCREEN`                                                                                      | Forward and Deferred     |
+| Soft shadows                    | In the URP Asset, in the **Shadows** section, disable ​**Soft shadows**​.                                                                                                          | `_SHADOWS_SOFT`                                                                                                                                                                 | Forward and Deferred     |
+
+| **Volume Override removed** | **Shader keywords this turns off**                                   |
+| ----------------------------------- | ---------------------------------------------------------------------------- |
+| Bloom                             | `_BLOOM_HQ`, `BLOOM_HQ_DIRT`, `_BLOOM_LQ`, `BLOOM_LQ_DIRT` |
+| Chromatic Aberration              | `_CHROMATIC_ABERRATION`                                                |
+| Film Grain                        | `_FILM_GRAIN`                                                          |
+| HDR Grading                       | `_HDR_GRADING`                                                         |
+| Lens Distortion                   | `_DISTORTION`                                                          |
+| Tonemapping                       | `_TONEMAP_ACES`, `_TONEMAP_NEUTRAL`, `_TONEMAP_GRADING`        |
+。</description><guid isPermaLink="true">https://ogazen.github.io/post/guan-jian-zi-%20-bian-ti.html</guid><pubDate>Fri, 07 Nov 2025 08:33:43 +0000</pubDate></item><item><title>URP Shader常用函数</title><link>https://ogazen.github.io/post/URP%20Shader-chang-yong-han-shu.html</link><description>[URP 文档](https://docs.unity.cn/cn/Packages-cn/com.unity.render-pipelines.universal@14.1/manual/)
 
 ### 在自定义 URP 着色器中转换坐标
 
