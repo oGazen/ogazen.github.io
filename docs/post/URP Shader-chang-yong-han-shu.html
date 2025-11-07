@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/68213482?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="[URP 文档](https://docs.unity.cn/cn/Packages-cn/com.unity.render-pipelines.universal@14.1/manual/)
+
+### 在自定义 URP 着色器中转换坐标
+
+> 1.在着色器文件的 `HLSLPROGRAM` 内部添加 `#include 'Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl'`。">
+<meta property="og:title" content="URP Shader常用函数">
+<meta property="og:description" content="[URP 文档](https://docs.unity.cn/cn/Packages-cn/com.unity.render-pipelines.universal@14.1/manual/)
+
+### 在自定义 URP 着色器中转换坐标
+
+> 1.在着色器文件的 `HLSLPROGRAM` 内部添加 `#include 'Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl'`。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ogazen.github.io/post/URP%20Shader-chang-yong-han-shu.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/68213482?v=4">
+<title>URP Shader常用函数</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">URP Shader常用函数</h1>
+<div class="title-right">
+    <a href="https://ogazen.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/oGazen/ogazen.github.io/issues/7" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a href="https://docs.unity.cn/cn/Packages-cn/com.unity.render-pipelines.universal@14.1/manual/" rel="nofollow">URP 文档</a></p>
+<h3>在自定义 URP 着色器中转换坐标</h3>
+<blockquote>
+<p>1.在着色器文件的 <code class="notranslate">HLSLPROGRAM</code> 内部添加 <code class="notranslate">#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"</code>。<code class="notranslate">Core.hlsl</code> 文件会自动导入 <code class="notranslate">ShaderVariablesFunction.hlsl</code> 文件。<br>
+2.使用 <code class="notranslate">ShaderVariablesFunction.hlsl</code> 文件中的以下方法之一。</p>
+</blockquote>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th align="left"><strong>方法</strong></th>
+<th align="left"><strong>语法</strong></th>
+<th align="left"><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code class="notranslate">GetNormalizedScreenSpaceUV</code></td>
+<td align="left"><code class="notranslate">float2 GetNormalizedScreenSpaceUV(float2 positionInClipSpace)</code></td>
+<td align="left">将裁剪空间中的位置转换为屏幕空间。</td>
+</tr>
+<tr>
+<td align="left"><code class="notranslate">GetObjectSpaceNormalizeViewDir</code></td>
+<td align="left"><code class="notranslate">half3 GetObjectSpaceNormalizeViewDir(float3 positionInObjectSpace)</code></td>
+<td align="left">将物体空间中的位置转换为朝向观察者的标准化方向。</td>
+</tr>
+<tr>
+<td align="left"><code class="notranslate">GetVertexNormalInputs</code></td>
+<td align="left"><code class="notranslate">VertexNormalInputs GetVertexNormalInputs(float3 normalInObjectSpace)</code></td>
+<td align="left">将物体空间中的法线转换为世界空间中的切线、双切线和法线。你还可以同时输入法线和 <code class="notranslate">float4</code> 形式的切线</td>
+</tr>
+<tr>
+<td align="left"><code class="notranslate">GetVertexPositionInputs</code></td>
+<td align="left"><code class="notranslate">VertexPositionInputs GetVertexPositionInputs(float3 positionInObjectSpace)</code></td>
+<td align="left">将物体空间中的顶点位置转换为世界空间、视图空间、裁剪空间和标准化设备坐标（NDC）。</td>
+</tr>
+<tr>
+<td align="left"><code class="notranslate">GetWorldSpaceNormalizeViewDir</code></td>
+<td align="left"><code class="notranslate">half3 GetWorldSpaceNormalizeViewDir(float3 positionInWorldSpace)</code></td>
+<td align="left">计算世界空间中的位置到观察者的方向，并进行标准化。</td>
+</tr>
+<tr>
+<td align="left"><code class="notranslate">GetWorldSpaceViewDir</code></td>
+<td align="left"><code class="notranslate">float3 GetWorldSpaceViewDir(float3 positionInWorldSpace)</code></td>
+<td align="left">计算世界空间中的位置到观察者的方向。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4>VertexPositionInputs</h4>
+<p>使用 <code class="notranslate">GetVertexPositionInputs</code> 方法可以获取此结构体。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>字段</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">float3 positionWS</code></td>
+<td>世界空间中的位置。</td>
+</tr>
+<tr>
+<td><code class="notranslate">float3 positionVS</code></td>
+<td>视图空间中的位置。</td>
+</tr>
+<tr>
+<td><code class="notranslate">float4 positionCS</code></td>
+<td>裁剪空间中的位置。</td>
+</tr>
+<tr>
+<td><code class="notranslate">float4 positionNDC</code></td>
+<td>归一化设备坐标（NDC）中的位置。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4>VertexNormalInputs</h4>
+<p>使用 <code class="notranslate">GetVertexNormalInputs</code> 方法可以获取此结构体。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>字段</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">real3 tangentWS</code></td>
+<td>世界空间中的切线。</td>
+</tr>
+<tr>
+<td><code class="notranslate">real3 bitangentWS</code></td>
+<td>世界空间中的双切线。</td>
+</tr>
+<tr>
+<td><code class="notranslate">float3 normalWS</code></td>
+<td>世界空间中的法线。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h3>在自定义 URP 着色器中使用相机</h3>
+<blockquote>
+<ol>
+<li>在着色器文件中的 <code class="notranslate">HLSLPROGRAM</code> 内部添加 <code class="notranslate">#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"</code>。<code class="notranslate">Core.hlsl</code> 文件会导入 <code class="notranslate">ShaderVariablesFunction.hlsl</code> 文件。</li>
+<li>使用以下方法之一，它们都在 <code class="notranslate">ShaderVariablesFunction.hlsl</code> 文件中定义。</li>
+</ol>
+</blockquote>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>方法</strong></th>
+<th><strong>语法</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">GetCameraPositionWS</code></td>
+<td><code class="notranslate">float3 GetCameraPositionWS()</code></td>
+<td>返回相机的世界空间位置。</td>
+</tr>
+<tr>
+<td><code class="notranslate">GetScaledScreenParams</code></td>
+<td><code class="notranslate">float4 GetScaledScreenParams()</code></td>
+<td>返回屏幕的宽度和高度（以像素为单位）。</td>
+</tr>
+<tr>
+<td><code class="notranslate">GetViewForwardDir</code></td>
+<td><code class="notranslate">float3 GetViewForwardDir()</code></td>
+<td>返回视图的前向方向（世界空间）。</td>
+</tr>
+<tr>
+<td><code class="notranslate">IsPerspectiveProjection</code></td>
+<td><code class="notranslate">bool IsPerspectiveProjection()</code></td>
+<td>如果相机的投影设置为透视投影，则返回 <code class="notranslate">true</code>。</td>
+</tr>
+<tr>
+<td><code class="notranslate">LinearDepthToEyeDepth</code></td>
+<td><code class="notranslate">half LinearDepthToEyeDepth(half linearDepth)</code></td>
+<td>将线性深度缓冲区值转换为视图深度。</td>
+</tr>
+<tr>
+<td><code class="notranslate">TransformScreenUV</code></td>
+<td><code class="notranslate">void TransformScreenUV(inout float2 screenSpaceUV)</code></td>
+<td>如果 Unity 使用的是颠倒的坐标空间，则翻转屏幕空间位置的 y 坐标。您还可以输入 <code class="notranslate">uv</code> 和屏幕高度（作为 <code class="notranslate">float</code>），方法将输出缩放到屏幕大小的像素位置。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h3>在自定义 URP 着色器中使用光照</h3>
+<blockquote>
+<ol>
+<li>在着色器文件中的 <code class="notranslate">HLSLPROGRAM</code> 内部添加 <code class="notranslate">#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"</code>。</li>
+<li>使用以下部分中的任何方法。</li>
+</ol>
+</blockquote>
+<h4>获取光照数据</h4>
+<p><code class="notranslate">Lighting.hlsl</code> 文件导入了 <code class="notranslate">RealtimeLights.hlsl</code> 文件，该文件包含以下方法。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>方法</strong></th>
+<th><strong>语法</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">GetMainLight</code></td>
+<td><code class="notranslate">Light GetMainLight()</code></td>
+<td>返回场景中的主光源。</td>
+</tr>
+<tr>
+<td><code class="notranslate">GetAdditionalLight</code></td>
+<td><code class="notranslate">Light GetAdditionalLight(uint lightIndex, float3 positionInWorldSpace)</code></td>
+<td>返回影响 <code class="notranslate">positionWS</code> 的 <code class="notranslate">lightIndex</code> 额外光源。例如，如果 <code class="notranslate">lightIndex</code> 为 <code class="notranslate">0</code>，该方法返回第一个额外光源。</td>
+</tr>
+<tr>
+<td><code class="notranslate">GetAdditionalLightsCount</code></td>
+<td><code class="notranslate">int GetAdditionalLightsCount()</code></td>
+<td>返回额外光源的数量。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4>为表面法线计算光照</h4>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>方法</strong></th>
+<th><strong>语法</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">LightingLambert</code></td>
+<td><code class="notranslate">half3 LightingLambert(half3 lightColor, half3 lightDirection, half3 surfaceNormal)</code></td>
+<td>使用 Lambert 模型计算并返回表面法线的漫反射光照。</td>
+</tr>
+<tr>
+<td><code class="notranslate">LightingSpecular</code></td>
+<td><code class="notranslate">half3 LightingSpecular(half3 lightColor, half3 lightDirection, half3 surfaceNormal, half3 viewDirection, half4 specularAmount, half smoothnessAmount)</code></td>
+<td>使用 简单阴影 计算并返回表面法线的高光反射光照。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4>计算环境光遮蔽</h4>
+<p><code class="notranslate">Lighting.hlsl</code> 文件导入了 <code class="notranslate">AmbientOcclusion.hlsl</code> 文件，该文件包含以下方法。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>方法</strong></th>
+<th><strong>语法</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">SampleAmbientOcclusion</code></td>
+<td><code class="notranslate">half SampleAmbientOcclusion(float2 normalizedScreenSpaceUV)</code></td>
+<td>返回屏幕空间中指定位置的环境光遮蔽值，其中 0 表示遮蔽，1 表示未遮蔽。</td>
+</tr>
+<tr>
+<td><code class="notranslate">GetScreenSpaceAmbientOcclusion</code></td>
+<td><code class="notranslate">AmbientOcclusionFactor GetScreenSpaceAmbientOcclusion(float2 normalizedScreenSpaceUV)</code></td>
+<td>返回屏幕空间中指定位置的间接和直接环境光遮蔽值，其中 0 表示遮蔽，1 表示未遮蔽。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4>AmbientOcclusionFactor</h4>
+<p>使用 <code class="notranslate">GetScreenSpaceAmbientOcclusion</code> 方法返回此结构体。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>字段</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">half indirectAmbientOcclusion</code></td>
+<td>由物体遮挡间接光导致的阴影量，表示物体受到环境光遮蔽的程度。</td>
+</tr>
+<tr>
+<td><code class="notranslate">half directAmbientOcclusion</code></td>
+<td>由物体遮挡直接光导致的阴影量，表示物体受到直接光遮蔽的程度。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4>Light</h4>
+<p>使用 <code class="notranslate">GetMainLight</code> 和 <code class="notranslate">GetAdditionalLight</code> 方法返回此结构体。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>字段</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">half3 direction</code></td>
+<td>光源的方向。</td>
+</tr>
+<tr>
+<td><code class="notranslate">half3 color</code></td>
+<td>光源的颜色。</td>
+</tr>
+<tr>
+<td><code class="notranslate">float distanceAttenuation</code></td>
+<td>光源的强度，基于光源与物体之间的距离。</td>
+</tr>
+<tr>
+<td><code class="notranslate">half shadowAttenuation</code></td>
+<td>光源的强度，基于物体是否在阴影中。</td>
+</tr>
+<tr>
+<td><code class="notranslate">uint layerMask</code></td>
+<td>光源的层掩码。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h3>在自定义 URP 着色器中使用阴影</h3>
+<p>要在自定义 Universal Render Pipeline (URP) 着色器中使用阴影，请按照以下步骤操作：</p>
+<ol>
+<li>在着色器文件的 <code class="notranslate">HLSLPROGRAM</code> 内部添加 <code class="notranslate">#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"</code>。<code class="notranslate">Core.hlsl</code> 文件会自动导入 <code class="notranslate">Shadows.hlsl</code> 和 <code class="notranslate">RealtimeLights.hlsl</code> 文件。</li>
+<li>使用以下部分的方法。</li>
+</ol>
+<h4>获取阴影空间中的位置</h4>
+<p>使用这些方法将位置转换为阴影贴图坐标。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>方法</strong></th>
+<th><strong>语法</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">GetShadowCoord</code></td>
+<td><code class="notranslate">float4 GetShadowCoord(VertexPositionInputs vertexInputs)</code></td>
+<td>将顶点位置转换为阴影空间。有关 <code class="notranslate">VertexPositionInputs</code> 结构体的信息</td>
+</tr>
+<tr>
+<td><code class="notranslate">TransformWorldToShadowCoord</code></td>
+<td><code class="notranslate">float4 TransformWorldToShadowCoord(float3 positionInWorldSpace)</code></td>
+<td>将世界空间中的位置转换为阴影空间。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4>计算阴影</h4>
+<p>以下方法使用阴影贴图计算阴影。在使用这些方法之前，请先完成以下步骤：</p>
+<ol>
+<li>确保场景中存在包含 <code class="notranslate">ShadowCaster</code> 着色器 Pass 的物体，例如使用 <code class="notranslate">Universal Render Pipeline/Lit</code> 着色器的物体。</li>
+<li>在着色器中添加 <code class="notranslate">#pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN</code>，以便访问主光源的阴影贴图。</li>
+<li>在着色器中添加 <code class="notranslate">#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS</code>，以便访问额外光源的阴影贴图。</li>
+</ol>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>方法</strong></th>
+<th><strong>语法</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">GetMainLight</code></td>
+<td><code class="notranslate">Light GetMainLight(float4 shadowCoordinates)</code></td>
+<td>返回场景中的主光源，并根据阴影坐标位置计算 <code class="notranslate">shadowAttenuation</code> 值。</td>
+</tr>
+<tr>
+<td><code class="notranslate">ComputeCascadeIndex</code></td>
+<td><code class="notranslate">half ComputeCascadeIndex(float3 positionInWorldSpace)</code></td>
+<td>返回世界空间中位置的阴影级联索引。</td>
+</tr>
+<tr>
+<td><code class="notranslate">AdditionalLightRealtimeShadow</code></td>
+<td><code class="notranslate">half AdditionalLightRealtimeShadow(int lightIndex, float3 positionInWorldSpace)</code></td>
+<td>在世界空间中的指定位置，从额外光源的阴影贴图中获取阴影值。</td>
+</tr>
+<tr>
+<td><code class="notranslate">GetMainLightShadowFade</code></td>
+<td><code class="notranslate">half GetMainLightShadowFade(float3 positionInWorldSpace)</code></td>
+<td>基于世界空间位置与相机的距离，返回主光源阴影的渐变程度。</td>
+</tr>
+<tr>
+<td><code class="notranslate">GetAdditionalLightShadowFade</code></td>
+<td><code class="notranslate">half GetAdditionalLightShadowFade(float3 positionInWorldSpace)</code></td>
+<td>基于世界空间位置与相机的距离，返回额外光源阴影的渐变程度。</td>
+</tr>
+<tr>
+<td><code class="notranslate">ApplyShadowBias</code></td>
+<td><code class="notranslate">float3 ApplyShadowBias(float3 positionInWorldSpace, float3 normalWS, float3 lightDirection)</code></td>
+<td>在世界空间的位置上添加阴影偏移。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://ogazen.github.io">Gazen's Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","oGazen/ogazen.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+
+
+</html>
