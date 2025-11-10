@@ -142,6 +142,7 @@ cmButton=document.getElementById("cmButton");
 function openComments(){
     cm=document.getElementById("comments");
     cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
     cmButton.innerHTML="loading";
     span=document.createElement("span");
     span.setAttribute("class","AnimatedEllipsis");
@@ -178,6 +179,6 @@ function iFrameLoading(){
 
 
 </script>
-
+<script src='https://ogazen.github.io/plugins/GmeekTOC.js'></script>
 
 </html>
