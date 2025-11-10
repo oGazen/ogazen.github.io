@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <link rel="icon" href="markdown-16.svg">
+  <link rel="stylesheet" href="./vditor.css" />
+  <script src="./vditor.min.js"></script>
+  <title>GFMEditor</title>
+</head>
+<body>
+<div>
+  <h1>GFM Editor For Vditor</h1>
+  <div id = 'vditor'></div>
+</div>
+<script>
+  let toolbar = [
+    "emoji",
+    "headings",
+    "bold",
+    "italic",
+    "strike",
+    "link",
+    "|",
+    "list",
+    "ordered-list",
+    "check",
+    "outdent",
+    "indent",
+    "|",
+    "quote",
+    "line",
+    "code",
+    "inline-code",
+    "insert-before",
+    "insert-after",
+    "|",
+    // "upload",
+    // "record",
+    "table",
+    "|",
+    "undo",
+    "redo",
+    "|",
+    "edit-mode",
+    // "content-theme",
+    "code-theme",
+    // "export",
+    "fullscreen",
+    {
+      name: "more",
+      toolbar: [
+        "both",
+        "preview",
+        "info",
+        "help",
+      ],
+    }]
+  
+  
+    new Vditor('vditor', {
+      toolbar,
+      placeholder: "Hello, Vditor!",
+      height: window.innerHeight + 100,
+      tab: "\t",
+    })
+  
+</script>
+</body>
+</html>
