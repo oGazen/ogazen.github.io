@@ -1,5 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 11 Nov 2025 01:27:53 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>关键字 变体</title><link>https://ogazen.github.io/post/guan-jian-zi-%20-bian-ti.html</link><description>#### 最常用引入(URP)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 11 Nov 2025 03:41:21 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>手自一体6AT变速箱</title><link>https://ogazen.github.io/post/shou-zi-yi-ti-6AT-bian-su-xiang.html</link><description>#### 使用技巧1
+
+&gt; [!NOTE]
+&gt; D : 前进档-最常用
+&gt; S : 运动档(Sport)-较D档延迟升档
+&gt; P : 驻车档
+&gt; R : 倒车档
+&gt; N : 空挡
+&gt; M : 手动档-上波升档下拨降档
+
+##### S档
+
+起步时用s档不合适！对速度提升是适得其反，原因在于6档前进的车，1、2档齿在1、2档停留时间过长速度是上不去的，而在车身没有大负重的情况下，反而浪费了速度提升。</description><guid isPermaLink="true">https://ogazen.github.io/post/shou-zi-yi-ti-6AT-bian-su-xiang.html</guid><pubDate>Tue, 11 Nov 2025 03:40:50 +0000</pubDate></item><item><title>关键字 变体</title><link>https://ogazen.github.io/post/guan-jian-zi-%20-bian-ti.html</link><description>#### 最常用引入(URP)
 
 * Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl
 * Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl
