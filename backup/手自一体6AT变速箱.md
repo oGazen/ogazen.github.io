@@ -193,7 +193,9 @@ D挡上长坡的过程中，您会听到变速箱咔咔的声音，你不用担�
 ![换挡示意图](https://ogazen.github.io/images/ShiftLever.jpg)
 
 
-#### 其他补充
+#### 参考链接
 
-[自动启停](https://www.zhihu.com/tardis/zm/art/259848642)
-[自动驻车](https://zhuanlan.zhihu.com/p/128661857)
+[使用技巧1](https://club.autohome.com.cn/bbs/threadowner/468e3096e494103e/26162595-1.html)
+[使用技巧2](https://club.autohome.com.cn/bbs/thread/a1538428d1418bab/32011153-1.html)
+[自动启停-长时停车发动机自动启停](https://www.zhihu.com/tardis/zm/art/259848642)
+[自动驻车-自动手刹](https://zhuanlan.zhihu.com/p/128661857)
