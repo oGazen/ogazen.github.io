@@ -197,6 +197,205 @@ color += w1/sum * <span class="pl-c1">tex2D</span>(_MainTex, i.uv01.xy);
 color += w1/sum * <span class="pl-c1">tex2D</span>(_MainTex, i.uv01.zw);  
 color += w2/sum * <span class="pl-c1">tex2D</span>(_MainTex, i.uv23.xy);  
 color += w2/sum * <span class="pl-c1">tex2D</span>(_MainTex, i.uv23.zw);</pre></div>
+<h4>完整代码</h4>
+<details>
+ <summary>GaussianBlur</summary>
+<div class="highlight highlight-source-hlsl"><pre class="notranslate">Shader <span class="pl-s">"URP/GaussianBlur"</span>
+{
+    Properties
+    {
+        [MainTexture]<span class="pl-c1">_MainTex</span> (<span class="pl-s">"Texture"</span>, 2D) = <span class="pl-s">"white"</span> {}
+        [MainColor]<span class="pl-c1">_Color</span> (<span class="pl-s">"Color"</span>,Color) = (<span class="pl-c1">1</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>)
+        [IntRange]<span class="pl-c1">_BlurRadius</span> (<span class="pl-s">"BlurRadius"</span>, <span class="pl-c1">Range</span>(<span class="pl-c1">1</span>,<span class="pl-c1">15</span>)) = <span class="pl-c1">5</span>
+    }
+    SubShader
+    {
+        Tags
+        {
+            <span class="pl-s">"RenderType"</span>=<span class="pl-s">"Transparent"</span>
+            <span class="pl-s">"RenderPipeline"</span>=<span class="pl-s">"UniversalPipeline"</span>
+            <span class="pl-s">"IgnoreProjector"</span>=<span class="pl-s">"true"</span>
+            <span class="pl-s">"Queue"</span>=<span class="pl-s">"Transparent"</span> <span class="pl-c">// Transparent AlphaTest Geometry Background</span>
+        }
+        LOD <span class="pl-c1">100</span>
+        Blend SrcAlpha OneMinusSrcAlpha
+
+        HLSLINCLUDE
+
+        
+<span class="pl-k">        #include</span> <span class="pl-s">"Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"</span>
+        
+
+        <span class="pl-c1">TEXTURE2D_X</span>(_MainTex);
+        <span class="pl-c1">SAMPLER</span>(sampler_MainTex);
+
+        <span class="pl-c1">CBUFFER_START</span>(UnityPerMaterial)
+        <span class="pl-k">half4</span> _Color;
+        <span class="pl-k">half4</span> _MainTex_ST;
+        <span class="pl-k">half4</span> _MainTex_TexelSize;
+        <span class="pl-k">int</span> _BlurRadius;
+        CBUFFER_END
+
+        
+        <span class="pl-k">struct</span> Attributes
+        {
+            <span class="pl-k">half4</span> position : <span class="pl-c1">POSITION</span>;
+            <span class="pl-k">half2</span> uv : <span class="pl-c1">TEXCOORD0</span>;
+        };
+
+
+        <span class="pl-k">struct</span> Varyings
+        {
+            <span class="pl-k">half4</span> position_sv : <span class="pl-c1">SV_POSITION</span>;
+            <span class="pl-k">half2</span> uv : <span class="pl-c1">TEXCOORD0</span>;
+        	<span class="pl-k">half4</span> uv01 : <span class="pl-c1">TEXCOORD1</span>;
+        	<span class="pl-k">half4</span> uv23 : <span class="pl-c1">TEXCOORD2</span>;
+        };
+
+		<span class="pl-c">/***  方式1 ***/</span>
+        <span class="pl-c">//这一步其实可以用计算出来的常量来替代，不需要在循环中每一步计算</span>
+		<span class="pl-k">half</span> <span class="pl-c1">GetGaussWeight</span>(<span class="pl-k">half</span> x, <span class="pl-k">half</span> y, <span class="pl-k">half</span> sigma)
+		{
+			<span class="pl-k">half</span> sigma2 = <span class="pl-c1">pow</span>(sigma, <span class="pl-c1">2.0f</span>);
+			<span class="pl-k">half</span> left = <span class="pl-c1">1</span> / (<span class="pl-c1">2</span> * sigma2 * <span class="pl-c1">3.1415926f</span>);
+			<span class="pl-k">half</span> right = <span class="pl-c1">exp</span>(-(x*x+y*y)/(<span class="pl-c1">2</span>*sigma2));
+			<span class="pl-k">return</span> left * right;
+		}
+
+        <span class="pl-k">half4</span> <span class="pl-c1">GaussBlur</span>(<span class="pl-k">float2</span> uv)
+		{
+			<span class="pl-c">//因为高斯函数中3σ以外的点的权重已经很小了，因此σ取半径r/3的值</span>
+			<span class="pl-k">half</span> sigma = _BlurRadius / <span class="pl-c1">3.</span>0h;
+			<span class="pl-k">half4</span> col = <span class="pl-k">half4</span>(<span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>);
+			<span class="pl-k">for</span> (<span class="pl-k">int</span> x = - _BlurRadius; x &lt;= _BlurRadius; ++x)
+			{
+				<span class="pl-k">for</span> (<span class="pl-k">int</span> y = - _BlurRadius; y &lt;= _BlurRadius; ++y)
+				{
+					<span class="pl-c">//获取周围像素的颜色</span>
+					<span class="pl-c">//因为uv是0-1的一个值，而像素坐标是整形，我们要取材质对应位置上的颜色，需要将整形的像素坐标</span>
+					<span class="pl-c">//转为uv上的坐标值</span>
+					<span class="pl-k">half4</span> color = <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex,sampler_MainTex,uv + <span class="pl-k">half2</span>(x * _MainTex_TexelSize.x, y * _MainTex_TexelSize.y));
+					<span class="pl-c">//获取此像素的权重</span>
+					<span class="pl-k">half</span> weight = <span class="pl-c1">GetGaussWeight</span>(x,y, sigma);
+					<span class="pl-c">//计算此点的最终颜色</span>
+					col += color * weight;
+					
+				}
+			}
+			<span class="pl-k">return</span> col;
+		}
+        
+
+        <span class="pl-c">/*** 方式2 ***/</span>
+        <span class="pl-c">//【5】准备高斯模糊权重矩阵参数7x4的矩阵 ||  Gauss Weight</span>
+		<span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-k">half4</span> GaussWeight[<span class="pl-c1">7</span>] =
+		{
+			<span class="pl-k">half4</span>(<span class="pl-c1">0.0205</span>,<span class="pl-c1">0.0205</span>,<span class="pl-c1">0.0205</span>,<span class="pl-c1">0</span>),
+			<span class="pl-k">half4</span>(<span class="pl-c1">0.0855</span>,<span class="pl-c1">0.0855</span>,<span class="pl-c1">0.0855</span>,<span class="pl-c1">0</span>),
+			<span class="pl-k">half4</span>(<span class="pl-c1">0.232</span>,<span class="pl-c1">0.232</span>,<span class="pl-c1">0.232</span>,<span class="pl-c1">0</span>),
+			<span class="pl-k">half4</span>(<span class="pl-c1">0.324</span>,<span class="pl-c1">0.324</span>,<span class="pl-c1">0.324</span>,<span class="pl-c1">1</span>),
+			<span class="pl-k">half4</span>(<span class="pl-c1">0.232</span>,<span class="pl-c1">0.232</span>,<span class="pl-c1">0.232</span>,<span class="pl-c1">0</span>),
+			<span class="pl-k">half4</span>(<span class="pl-c1">0.0855</span>,<span class="pl-c1">0.0855</span>,<span class="pl-c1">0.0855</span>,<span class="pl-c1">0</span>),
+			<span class="pl-k">half4</span>(<span class="pl-c1">0.0205</span>,<span class="pl-c1">0.0205</span>,<span class="pl-c1">0.0205</span>,<span class="pl-c1">0</span>)
+		};
+
+        <span class="pl-c">// 水平一次 垂直一次</span>
+        <span class="pl-k">half4</span> <span class="pl-c1">GaussBlur2</span>(<span class="pl-k">half2</span> uv,<span class="pl-k">half2</span> offset)
+		{
+			<span class="pl-c">//【11.2】获取偏移量</span>
+			<span class="pl-k">half2</span> OffsetWidth = _MainTex_TexelSize.xy * offset;
+			<span class="pl-c">//从中心点偏移3个间隔，从最左或最上开始加权累加</span>
+			<span class="pl-k">half2</span> uv_withOffset = uv - OffsetWidth * <span class="pl-c1">3.0</span>;
+	 
+			<span class="pl-c">//【11.3】循环获取加权后的颜色值</span>
+			<span class="pl-k">half4</span> color = <span class="pl-c1">0</span>;
+			<span class="pl-k">for</span> (<span class="pl-k">int</span> j = <span class="pl-c1">0</span>; j &lt; <span class="pl-c1">7</span>; j++)
+			{
+				<span class="pl-c">//偏移后的像素纹理值</span>
+				<span class="pl-k">half4</span> texCol = <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex, sampler_MainTex,uv_withOffset);
+				<span class="pl-c">//待输出颜色值+=偏移后的像素纹理值 x 高斯权重</span>
+				color += texCol * GaussWeight[j];
+				<span class="pl-c">//移到下一个像素处，准备下一次循环加权</span>
+				uv_withOffset += OffsetWidth;
+			}
+	 
+			<span class="pl-c">//【11.4】返回最终的颜色值</span>
+			<span class="pl-k">return</span> color;
+		}
+
+        
+        <span class="pl-c">/*** 方式3 ***/</span>
+        <span class="pl-k">half</span> <span class="pl-c1">GetGaussWeight3</span>(<span class="pl-k">half</span> x,<span class="pl-k">half</span> sigma)
+		{
+			<span class="pl-k">half</span> sigma2 = <span class="pl-c1">pow</span>(sigma, <span class="pl-c1">2.</span>0h);
+			<span class="pl-k">half</span> left = <span class="pl-c1">1</span> / (sigma * <span class="pl-c1">sqrt</span>(<span class="pl-c1">2</span>*PI));
+			<span class="pl-k">half</span> right = <span class="pl-c1">exp</span>(-<span class="pl-c1">pow</span>(x,<span class="pl-c1">2.</span>0h)/<span class="pl-c1">2</span>*sigma2);
+			<span class="pl-k">return</span> left * right;
+		}
+
+        <span class="pl-k">half4</span> <span class="pl-c1">GaussBlur3</span>(Varyings IN)
+        {
+        	<span class="pl-k">half4</span> color = <span class="pl-c1">0</span>;
+        	<span class="pl-k">half</span> sigma = <span class="pl-c1">1</span>;
+	        <span class="pl-k">half</span> w0 = <span class="pl-c1">GetGaussWeight3</span>(<span class="pl-c1">0</span>,sigma);
+            <span class="pl-k">half</span> w1 = <span class="pl-c1">GetGaussWeight3</span>(<span class="pl-c1">1</span>,sigma);
+            <span class="pl-k">half</span> w2 = <span class="pl-c1">GetGaussWeight3</span>(<span class="pl-c1">2</span>,sigma);
+            <span class="pl-k">half</span> sum = w0+w1*<span class="pl-c1">2</span>+w2*<span class="pl-c1">2</span>;
+            color += w0/sum * <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex, sampler_MainTex,IN.uv);  
+            color += w1/sum * <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex, sampler_MainTex,IN.uv01.xy);  
+            color += w1/sum * <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex, sampler_MainTex,IN.uv01.zw);  
+            color += w2/sum * <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex, sampler_MainTex,IN.uv23.xy);  
+            color += w2/sum * <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex, sampler_MainTex,IN.uv23.zw);
+
+        	<span class="pl-k">return</span> color;
+        }
+        
+        
+        ENDHLSL
+        
+        
+        Pass
+        {
+            HLSLPROGRAM
+
+<span class="pl-k">            #pragma</span> vertex Vert
+<span class="pl-k">			#pragma</span> fragment Frag
+            
+            Varyings <span class="pl-c1">Vert</span>(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.position_sv = <span class="pl-c1">TransformObjectToHClip</span>(IN.position);
+                OUT.uv = <span class="pl-c1">TRANSFORM_TEX</span>(IN.uv,_MainTex);
+
+
+        		<span class="pl-c">// 方案3使用</span>
+        		<span class="pl-k">half4</span> _offsets = <span class="pl-k">half4</span>(<span class="pl-c1">3</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>);
+                _offsets *= _MainTex_TexelSize.xyxy;  
+                OUT.uv01 = IN.uv.xyxy + _offsets.xyxy * <span class="pl-k">float4</span>(<span class="pl-c1">1</span>, <span class="pl-c1">1</span>, -<span class="pl-c1">1</span>, -<span class="pl-c1">1</span>);  
+                OUT.uv23 = IN.uv.xyxy + _offsets.xyxy * <span class="pl-k">float4</span>(<span class="pl-c1">1</span>, <span class="pl-c1">1</span>, -<span class="pl-c1">1</span>, -<span class="pl-c1">1</span>) * <span class="pl-c1">2.0</span>;  
+        	
+                <span class="pl-k">return</span> OUT;
+            }
+
+
+
+            <span class="pl-k">half4</span> <span class="pl-c1">Frag</span>(Varyings IN) : <span class="pl-c1">SV_Target</span>
+            {
+                <span class="pl-k">return</span> <span class="pl-c1">GaussBlur3</span>(IN);
+            }
+            
+            
+            ENDHLSL
+        }
+        
+
+    }
+
+
+
+
+}</pre></div>
+</details>
 <h4>参考链接</h4>
 <p><a href="https://www.jianshu.com/p/e74eb43960a1" rel="nofollow">Markdown数学公式语法</a><br>
 <a href="https://developer.unity.cn/projects/5e61c696edbc2a01c1bf362b" rel="nofollow">Unity Shader 均值模糊和高斯模糊 </a><br>
