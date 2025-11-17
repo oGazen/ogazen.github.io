@@ -1,5 +1,239 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Thu, 13 Nov 2025 06:12:18 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>高斯模糊</title><link>https://ogazen.github.io/post/gao-si-mo-hu.html</link><description>&gt; ###### 降采样
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Mon, 17 Nov 2025 09:31:20 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua.html</link><description>&lt;details&gt;
+&lt;summary&gt;UIScan&lt;/summary&gt;
+
+```
+Shader 'URP/UIScan'
+{
+    Properties
+    {
+        [HideInInspector]_MainTex ('Texture', 2D) = 'white' {}
+        _Color ('Color',Color) = (1,1,1,1)
+        [Toggle] _Reverse('Reverse',Integer) = 0
+        
+        
+        [Header(SCAN)]
+        _ScanIntensity('Scan Intensity',Range(0,2)) = 1
+        _ScanWidth('Scan Width',Range(0,0.5)) = 0.1
+        _ScanAngle('Scan Angle',Range(-89,89)) = 0 // 水平为0
+        _Feathering('Feathering',Range(0,1)) = 0
+        
+        [Header(TIME)]
+        _TimeDuration('Time Duration',Range(1,5)) = 1
+        _TimeInterval('Time Interval',Range(0,5)) = 1
+    }
+    SubShader
+    {
+        Tags
+        {
+            'RenderType'='Transparent'
+            'RenderPipeline'='UniversalPipeline'
+            'IgnoreProjector'='true'
+            'Queue'='Transparent' // Transparent AlphaTest Geometry Background
+        }
+        LOD 100
+        Blend SrcAlpha OneMinusSrcAlpha
+
+        Pass
+        {
+            HLSLPROGRAM
+
+
+            #include 'Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl'
+
+            #pragma vertex Vert
+            #pragma fragment Frag
+
+
+
+            TEXTURE2D_X(_MainTex);
+            SAMPLER(sampler_MainTex);
+
+            CBUFFER_START(UnityPerMaterial)
+            half4 _MainTex_ST;
+
+
+            half4 _Color;
+            
+            half _ScanIntensity;
+            half _ScanWidth;
+            half _ScanAngle;
+            half _Feathering;
+
+            half _TimeDuration;
+            half _TimeInterval;
+            int _Reverse;
+            CBUFFER_END
+
+            
+            struct Attributes
+            {
+                half4 position : POSITION;
+                half2 uv : TEXCOORD0;
+                half4 color : COLOR;
+            };
+
+
+            struct Varyings
+            {
+                half4 position_sv : SV_POSITION;
+                half2 uv : TEXCOORD0;
+                half4 color : COLOR;
+            };
+
+
+            Varyings Vert(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.position_sv = TransformObjectToHClip(IN.position);
+                OUT.uv = TRANSFORM_TEX(IN.uv,_MainTex);
+                OUT.color = IN.color;
+                return OUT;
+            }
+
+
+
+            half4 Frag(Varyings IN) : SV_Target
+            {
+                half4 col = SAMPLE_TEXTURE2D_X(_MainTex,sampler_MainTex,IN.uv) * IN.color;
+
+                // 时间的变化周期，时间间隔
+                half timey = _Time.y;
+                half timey_normal = timey % (_TimeDuration + _TimeInterval) / _TimeDuration;
+                timey_normal = saturate(timey_normal);
+
+
+                // 扫描效果
+                _ScanAngle = _Reverse==0 ? _ScanAngle : _ScanAngle * -1;
+                half k = tan(radians(_ScanAngle));
+                half cos_v = cos(radians(_ScanAngle));
+                half halfWidth = _ScanWidth / 2 / cos_v;
+
+                half b,y;
+                if(k &gt; 0)
+                {
+                    b = lerp(-halfWidth-k,1+halfWidth,timey_normal);
+                    y = k*IN.uv.x + b;
+                }
+                else
+                {
+                    b = lerp(-halfWidth,1+halfWidth+abs(k),timey_normal);
+                    y = k*IN.uv.x + b;
+                }
+
+                
+                half y_min = y - halfWidth;
+                half y_max = y + halfWidth;
+                half uv_y = _Reverse==0 ? IN.uv.y : 1-IN.uv.y;
+                if (uv_y &gt;= y_min &amp;&amp; uv_y &lt;= y_max)
+                {
+                    // 羽化效果
+                    half4 colAdd = _Color * _ScanIntensity;
+                    half feather = smoothstep(halfWidth,0,abs(uv_y - y));
+                    colAdd *= feather;
+                    col += colAdd; 
+                }
+                
+
+                
+                return col;
+            }
+            
+
+            
+            ENDHLSL
+        }
+    }
+}
+```
+
+&lt;/details&gt;
+
+&lt;details&gt;
+&lt;summary&gt;UIGray&lt;/summary&gt;
+
+```
+Shader 'URP/UIGray'
+{
+    Properties
+    {
+        [HideInInspector]_MainTex ('Texture', 2D) = 'white' {}
+    }
+    SubShader
+    {
+        Tags
+        {
+            'RenderType'='Transparent'
+            'RenderPipeline'='UniversalPipeline'
+            'IgnoreProjector'='true'
+            'Queue'='Transparent' // Transparent AlphaTest Geometry Background
+        }
+        LOD 100
+        Blend SrcAlpha OneMinusSrcAlpha
+
+        Pass
+        {
+            HLSLPROGRAM
+
+
+            #include 'Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl'
+
+            #pragma vertex Vert
+            #pragma fragment Frag
+
+
+
+            TEXTURE2D_X(_MainTex);
+            SAMPLER(sampler_MainTex);
+
+            CBUFFER_START(UnityPerMaterial)
+            half4 _MainTex_ST;
+            CBUFFER_END
+
+            
+            struct Attributes
+            {
+                half4 position : POSITION;
+                half2 uv : TEXCOORD0;
+            };
+
+
+            struct Varyings
+            {
+                half4 position_sv : SV_POSITION;
+                half2 uv : TEXCOORD0;
+            };
+
+
+            Varyings Vert(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.position_sv = TransformObjectToHClip(IN.position);
+                OUT.uv = TRANSFORM_TEX(IN.uv,_MainTex);
+                return OUT;
+            }
+
+
+
+            half4 Frag(Varyings IN) : SV_Target
+            {
+                half4 col = SAMPLE_TEXTURE2D_X(_MainTex,sampler_MainTex,IN.uv);
+                const half3 gray_multiply = half3(0.222h, 0.707h, 0.071h);
+                col.rgb = dot(col.rgb,gray_multiply);
+                return col;
+            }
+            
+
+            
+            ENDHLSL
+        }
+    }
+}
+
+```
+
+&lt;/details&gt;
+。</description><guid isPermaLink="true">https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua.html</guid><pubDate>Mon, 17 Nov 2025 09:30:50 +0000</pubDate></item><item><title>高斯模糊</title><link>https://ogazen.github.io/post/gao-si-mo-hu.html</link><description>&gt; ###### 降采样
 &gt; 
 &gt; 降采样（Downsample）也称下采样（Subsample），按字面意思理解即是降低采样频率。</description><guid isPermaLink="true">https://ogazen.github.io/post/gao-si-mo-hu.html</guid><pubDate>Thu, 13 Nov 2025 06:11:48 +0000</pubDate></item><item><title>URP描边效果</title><link>https://ogazen.github.io/post/URP-miao-bian-xiao-guo.html</link><description>##### 法线外扩/视口夹角
 
