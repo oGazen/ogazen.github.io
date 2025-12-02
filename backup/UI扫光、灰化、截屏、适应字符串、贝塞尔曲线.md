@@ -1,7 +1,7 @@
 <details>
 <summary>UIScan</summary>
 
-```
+```hlsl
 Shader "URP/UIScan"
 {
     Properties
@@ -151,7 +151,7 @@ Shader "URP/UIScan"
 <details>
 <summary>UIGray</summary>
 
-```
+```hlsl
 Shader "URP/UIGray"
 {
     Properties
@@ -341,6 +341,112 @@ Shader "URP/UIGray"
 
             return newpos;
         }
+```
+
+
+</details>
+
+<details>
+<summary>适应字符串</summary>
+
+```cs
+using System.Collections.Generic;
+using UnityEngine;
+using System.Text;
+using UnityEngine.UI;
+using System;
+
+public class BMTextFit : MonoBehaviour
+{
+    public enum TextCompProp
+    {
+        TextLegacy,
+        TMP_UI,
+        TMP_3D
+    }
+
+
+    [SerializeField] private TextCompProp m_textCompProp;
+
+
+    
+    // 字符换字节宽度限制
+    private void FitText1()
+    {
+        var TComp = GetComponent<Text>();
+        var origStr = TComp.text;
+        var endIndex = 20;
+        
+        if (String.IsNullOrEmpty(origStr)) return;
+        
+        int bytesCount = Encoding.UTF8.GetByteCount(origStr);
+        if (bytesCount > endIndex)
+        {
+            int readyLength = 0;
+            float readyWidth = 0;
+            for (int i = 0; i < origStr.Length; i++)
+            {
+                // 中日韩 0x4E00-0x9FFF 字 3字节
+                // 标点符号如下范围
+                // 0x3000-0x303F 0xFF00-0xFFEF 0xFE10-0xFE1F 0xFE30-0xFE4F 3字节
+                // 0x00B7, 0x2014, 0x2026, 0x2018, 0x2019, 0x201C, 0x201D 1字节
+                readyLength += Encoding.UTF8.GetByteCount(new [] { origStr[i] });
+                if (readyLength == endIndex)
+                {
+                    origStr = origStr.Substring(0, i + 1) + "...";
+                    break;
+                }
+                else if (readyLength > endIndex)
+                {
+                    origStr = origStr.Substring(0, i) + "...";
+                    break;
+                }
+            }
+        }
+
+        TComp.text = origStr;
+    }
+
+
+    
+    // 字符串字节渲染宽度限制
+    private void FitText2()
+    {
+        var TComp = GetComponent<Text>();
+        TextGenerator textGenerator = TComp.cachedTextGenerator;
+        List<UICharInfo> list_ui_char = new List<UICharInfo>();
+        textGenerator.GetCharacters(list_ui_char);
+        
+        var origStr = TComp.text;
+        var maxWidth = 300;
+        
+        if (String.IsNullOrEmpty(origStr)) return;
+        
+        float readyWidth = 0;
+        for (int i = 0; i < origStr.Length; i++)
+        {
+            readyWidth += list_ui_char[i].charWidth;
+            if (maxWidth == readyWidth)
+            {
+                origStr = origStr.Substring(0, i + 1) + "...";
+                break;
+            }
+            else if(readyWidth > maxWidth)
+            {
+                origStr = origStr.Substring(0, i) + "...";
+                break;
+            }
+        }
+        
+        TComp.text = origStr;
+    }
+    
+    
+}
+
+
+
+
 ```
 
 

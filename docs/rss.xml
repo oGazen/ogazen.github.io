@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 02:06:00 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian.html</link><description>&lt;details&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 06:56:46 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian.html</link><description>&lt;details&gt;
 &lt;summary&gt;UIScan&lt;/summary&gt;
 
-```
+```hlsl
 Shader 'URP/UIScan'
 {
     Properties
@@ -152,7 +152,7 @@ Shader 'URP/UIScan'
 &lt;details&gt;
 &lt;summary&gt;UIGray&lt;/summary&gt;
 
-```
+```hlsl
 Shader 'URP/UIGray'
 {
     Properties
@@ -342,6 +342,112 @@ Shader 'URP/UIGray'
 
             return newpos;
         }
+```
+
+
+&lt;/details&gt;
+
+&lt;details&gt;
+&lt;summary&gt;适应字符串&lt;/summary&gt;
+
+```cs
+using System.Collections.Generic;
+using UnityEngine;
+using System.Text;
+using UnityEngine.UI;
+using System;
+
+public class BMTextFit : MonoBehaviour
+{
+    public enum TextCompProp
+    {
+        TextLegacy,
+        TMP_UI,
+        TMP_3D
+    }
+
+
+    [SerializeField] private TextCompProp m_textCompProp;
+
+
+    
+    // 字符换字节宽度限制
+    private void FitText1()
+    {
+        var TComp = GetComponent&lt;Text&gt;();
+        var origStr = TComp.text;
+        var endIndex = 20;
+        
+        if (String.IsNullOrEmpty(origStr)) return;
+        
+        int bytesCount = Encoding.UTF8.GetByteCount(origStr);
+        if (bytesCount &gt; endIndex)
+        {
+            int readyLength = 0;
+            float readyWidth = 0;
+            for (int i = 0; i &lt; origStr.Length; i++)
+            {
+                // 中日韩 0x4E00-0x9FFF 字 3字节
+                // 标点符号如下范围
+                // 0x3000-0x303F 0xFF00-0xFFEF 0xFE10-0xFE1F 0xFE30-0xFE4F 3字节
+                // 0x00B7, 0x2014, 0x2026, 0x2018, 0x2019, 0x201C, 0x201D 1字节
+                readyLength += Encoding.UTF8.GetByteCount(new [] { origStr[i] });
+                if (readyLength == endIndex)
+                {
+                    origStr = origStr.Substring(0, i + 1) + '...';
+                    break;
+                }
+                else if (readyLength &gt; endIndex)
+                {
+                    origStr = origStr.Substring(0, i) + '...';
+                    break;
+                }
+            }
+        }
+
+        TComp.text = origStr;
+    }
+
+
+    
+    // 字符串字节渲染宽度限制
+    private void FitText2()
+    {
+        var TComp = GetComponent&lt;Text&gt;();
+        TextGenerator textGenerator = TComp.cachedTextGenerator;
+        List&lt;UICharInfo&gt; list_ui_char = new List&lt;UICharInfo&gt;();
+        textGenerator.GetCharacters(list_ui_char);
+        
+        var origStr = TComp.text;
+        var maxWidth = 300;
+        
+        if (String.IsNullOrEmpty(origStr)) return;
+        
+        float readyWidth = 0;
+        for (int i = 0; i &lt; origStr.Length; i++)
+        {
+            readyWidth += list_ui_char[i].charWidth;
+            if (maxWidth == readyWidth)
+            {
+                origStr = origStr.Substring(0, i + 1) + '...';
+                break;
+            }
+            else if(readyWidth &gt; maxWidth)
+            {
+                origStr = origStr.Substring(0, i) + '...';
+                break;
+            }
+        }
+        
+        TComp.text = origStr;
+    }
+    
+    
+}
+
+
+
+
 ```
 
 

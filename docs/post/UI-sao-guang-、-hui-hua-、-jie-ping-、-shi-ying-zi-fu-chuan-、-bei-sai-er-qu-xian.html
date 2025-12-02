@@ -13,7 +13,7 @@
 <meta name="description" content="<details>
 <summary>UIScan</summary>
 
-```
+```hlsl
 Shader 'URP/UIScan'
 {
     Properties
@@ -163,7 +163,7 @@ Shader 'URP/UIScan'
 <details>
 <summary>UIGray</summary>
 
-```
+```hlsl
 Shader 'URP/UIGray'
 {
     Properties
@@ -353,6 +353,112 @@ Shader 'URP/UIGray'
 
             return newpos;
         }
+```
+
+
+</details>
+
+<details>
+<summary>适应字符串</summary>
+
+```cs
+using System.Collections.Generic;
+using UnityEngine;
+using System.Text;
+using UnityEngine.UI;
+using System;
+
+public class BMTextFit : MonoBehaviour
+{
+    public enum TextCompProp
+    {
+        TextLegacy,
+        TMP_UI,
+        TMP_3D
+    }
+
+
+    [SerializeField] private TextCompProp m_textCompProp;
+
+
+    
+    // 字符换字节宽度限制
+    private void FitText1()
+    {
+        var TComp = GetComponent<Text>();
+        var origStr = TComp.text;
+        var endIndex = 20;
+        
+        if (String.IsNullOrEmpty(origStr)) return;
+        
+        int bytesCount = Encoding.UTF8.GetByteCount(origStr);
+        if (bytesCount > endIndex)
+        {
+            int readyLength = 0;
+            float readyWidth = 0;
+            for (int i = 0; i < origStr.Length; i++)
+            {
+                // 中日韩 0x4E00-0x9FFF 字 3字节
+                // 标点符号如下范围
+                // 0x3000-0x303F 0xFF00-0xFFEF 0xFE10-0xFE1F 0xFE30-0xFE4F 3字节
+                // 0x00B7, 0x2014, 0x2026, 0x2018, 0x2019, 0x201C, 0x201D 1字节
+                readyLength += Encoding.UTF8.GetByteCount(new [] { origStr[i] });
+                if (readyLength == endIndex)
+                {
+                    origStr = origStr.Substring(0, i + 1) + '...';
+                    break;
+                }
+                else if (readyLength > endIndex)
+                {
+                    origStr = origStr.Substring(0, i) + '...';
+                    break;
+                }
+            }
+        }
+
+        TComp.text = origStr;
+    }
+
+
+    
+    // 字符串字节渲染宽度限制
+    private void FitText2()
+    {
+        var TComp = GetComponent<Text>();
+        TextGenerator textGenerator = TComp.cachedTextGenerator;
+        List<UICharInfo> list_ui_char = new List<UICharInfo>();
+        textGenerator.GetCharacters(list_ui_char);
+        
+        var origStr = TComp.text;
+        var maxWidth = 300;
+        
+        if (String.IsNullOrEmpty(origStr)) return;
+        
+        float readyWidth = 0;
+        for (int i = 0; i < origStr.Length; i++)
+        {
+            readyWidth += list_ui_char[i].charWidth;
+            if (maxWidth == readyWidth)
+            {
+                origStr = origStr.Substring(0, i + 1) + '...';
+                break;
+            }
+            else if(readyWidth > maxWidth)
+            {
+                origStr = origStr.Substring(0, i) + '...';
+                break;
+            }
+        }
+        
+        TComp.text = origStr;
+    }
+    
+    
+}
+
+
+
+
 ```
 
 
@@ -361,7 +467,7 @@ Shader 'URP/UIGray'
 <meta property="og:description" content="<details>
 <summary>UIScan</summary>
 
-```
+```hlsl
 Shader 'URP/UIScan'
 {
     Properties
@@ -511,7 +617,7 @@ Shader 'URP/UIScan'
 <details>
 <summary>UIGray</summary>
 
-```
+```hlsl
 Shader 'URP/UIGray'
 {
     Properties
@@ -701,6 +807,112 @@ Shader 'URP/UIGray'
 
             return newpos;
         }
+```
+
+
+</details>
+
+<details>
+<summary>适应字符串</summary>
+
+```cs
+using System.Collections.Generic;
+using UnityEngine;
+using System.Text;
+using UnityEngine.UI;
+using System;
+
+public class BMTextFit : MonoBehaviour
+{
+    public enum TextCompProp
+    {
+        TextLegacy,
+        TMP_UI,
+        TMP_3D
+    }
+
+
+    [SerializeField] private TextCompProp m_textCompProp;
+
+
+    
+    // 字符换字节宽度限制
+    private void FitText1()
+    {
+        var TComp = GetComponent<Text>();
+        var origStr = TComp.text;
+        var endIndex = 20;
+        
+        if (String.IsNullOrEmpty(origStr)) return;
+        
+        int bytesCount = Encoding.UTF8.GetByteCount(origStr);
+        if (bytesCount > endIndex)
+        {
+            int readyLength = 0;
+            float readyWidth = 0;
+            for (int i = 0; i < origStr.Length; i++)
+            {
+                // 中日韩 0x4E00-0x9FFF 字 3字节
+                // 标点符号如下范围
+                // 0x3000-0x303F 0xFF00-0xFFEF 0xFE10-0xFE1F 0xFE30-0xFE4F 3字节
+                // 0x00B7, 0x2014, 0x2026, 0x2018, 0x2019, 0x201C, 0x201D 1字节
+                readyLength += Encoding.UTF8.GetByteCount(new [] { origStr[i] });
+                if (readyLength == endIndex)
+                {
+                    origStr = origStr.Substring(0, i + 1) + '...';
+                    break;
+                }
+                else if (readyLength > endIndex)
+                {
+                    origStr = origStr.Substring(0, i) + '...';
+                    break;
+                }
+            }
+        }
+
+        TComp.text = origStr;
+    }
+
+
+    
+    // 字符串字节渲染宽度限制
+    private void FitText2()
+    {
+        var TComp = GetComponent<Text>();
+        TextGenerator textGenerator = TComp.cachedTextGenerator;
+        List<UICharInfo> list_ui_char = new List<UICharInfo>();
+        textGenerator.GetCharacters(list_ui_char);
+        
+        var origStr = TComp.text;
+        var maxWidth = 300;
+        
+        if (String.IsNullOrEmpty(origStr)) return;
+        
+        float readyWidth = 0;
+        for (int i = 0; i < origStr.Length; i++)
+        {
+            readyWidth += list_ui_char[i].charWidth;
+            if (maxWidth == readyWidth)
+            {
+                origStr = origStr.Substring(0, i + 1) + '...';
+                break;
+            }
+            else if(readyWidth > maxWidth)
+            {
+                origStr = origStr.Substring(0, i) + '...';
+                break;
+            }
+        }
+        
+        TComp.text = origStr;
+    }
+    
+    
+}
+
+
+
+
 ```
 
 
@@ -777,35 +989,35 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><details>
 <summary>UIScan</summary>
-<pre class="notranslate"><code class="notranslate">Shader "URP/UIScan"
+<div class="highlight highlight-source-hlsl"><pre class="notranslate">Shader <span class="pl-s">"URP/UIScan"</span>
 {
     Properties
     {
-        [HideInInspector]_MainTex ("Texture", 2D) = "white" {}
-        _Color ("Color",Color) = (1,1,1,1)
-        [Toggle] _Reverse("Reverse",Integer) = 0
+        [HideInInspector]<span class="pl-c1">_MainTex</span> (<span class="pl-s">"Texture"</span>, 2D) = <span class="pl-s">"white"</span> {}
+        <span class="pl-c1">_Color</span> (<span class="pl-s">"Color"</span>,Color) = (<span class="pl-c1">1</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>)
+        [Toggle] <span class="pl-c1">_Reverse</span>(<span class="pl-s">"Reverse"</span>,Integer) = <span class="pl-c1">0</span>
         
         
-        [Header(SCAN)]
-        _ScanIntensity("Scan Intensity",Range(0,2)) = 1
-        _ScanWidth("Scan Width",Range(0,0.5)) = 0.1
-        _ScanAngle("Scan Angle",Range(-89,89)) = 0 // 水平为0
-        _Feathering("Feathering",Range(0,1)) = 0
+        [<span class="pl-c1">Header</span>(SCAN)]
+        <span class="pl-c1">_ScanIntensity</span>(<span class="pl-s">"Scan Intensity"</span>,<span class="pl-c1">Range</span>(<span class="pl-c1">0</span>,<span class="pl-c1">2</span>)) = <span class="pl-c1">1</span>
+        <span class="pl-c1">_ScanWidth</span>(<span class="pl-s">"Scan Width"</span>,<span class="pl-c1">Range</span>(<span class="pl-c1">0</span>,<span class="pl-c1">0.5</span>)) = <span class="pl-c1">0.1</span>
+        <span class="pl-c1">_ScanAngle</span>(<span class="pl-s">"Scan Angle"</span>,<span class="pl-c1">Range</span>(-<span class="pl-c1">89</span>,<span class="pl-c1">89</span>)) = <span class="pl-c1">0</span> <span class="pl-c">// 水平为0</span>
+        <span class="pl-c1">_Feathering</span>(<span class="pl-s">"Feathering"</span>,<span class="pl-c1">Range</span>(<span class="pl-c1">0</span>,<span class="pl-c1">1</span>)) = <span class="pl-c1">0</span>
         
-        [Header(TIME)]
-        _TimeDuration("Time Duration",Range(1,5)) = 1
-        _TimeInterval("Time Interval",Range(0,5)) = 1
+        [<span class="pl-c1">Header</span>(TIME)]
+        <span class="pl-c1">_TimeDuration</span>(<span class="pl-s">"Time Duration"</span>,<span class="pl-c1">Range</span>(<span class="pl-c1">1</span>,<span class="pl-c1">5</span>)) = <span class="pl-c1">1</span>
+        <span class="pl-c1">_TimeInterval</span>(<span class="pl-s">"Time Interval"</span>,<span class="pl-c1">Range</span>(<span class="pl-c1">0</span>,<span class="pl-c1">5</span>)) = <span class="pl-c1">1</span>
     }
     SubShader
     {
         Tags
         {
-            "RenderType"="Transparent"
-            "RenderPipeline"="UniversalPipeline"
-            "IgnoreProjector"="true"
-            "Queue"="Transparent" // Transparent AlphaTest Geometry Background
+            <span class="pl-s">"RenderType"</span>=<span class="pl-s">"Transparent"</span>
+            <span class="pl-s">"RenderPipeline"</span>=<span class="pl-s">"UniversalPipeline"</span>
+            <span class="pl-s">"IgnoreProjector"</span>=<span class="pl-s">"true"</span>
+            <span class="pl-s">"Queue"</span>=<span class="pl-s">"Transparent"</span> <span class="pl-c">// Transparent AlphaTest Geometry Background</span>
         }
-        LOD 100
+        LOD <span class="pl-c1">100</span>
         Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
@@ -813,104 +1025,104 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
             HLSLPROGRAM
 
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+<span class="pl-k">            #include</span> <span class="pl-s">"Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"</span>
 
-            #pragma vertex Vert
-            #pragma fragment Frag
-
-
-
-            TEXTURE2D_X(_MainTex);
-            SAMPLER(sampler_MainTex);
-
-            CBUFFER_START(UnityPerMaterial)
-            half4 _MainTex_ST;
+<span class="pl-k">            #pragma</span> vertex Vert
+<span class="pl-k">            #pragma</span> fragment Frag
 
 
-            half4 _Color;
+
+            <span class="pl-c1">TEXTURE2D_X</span>(_MainTex);
+            <span class="pl-c1">SAMPLER</span>(sampler_MainTex);
+
+            <span class="pl-c1">CBUFFER_START</span>(UnityPerMaterial)
+            <span class="pl-k">half4</span> _MainTex_ST;
+
+
+            <span class="pl-k">half4</span> _Color;
             
-            half _ScanIntensity;
-            half _ScanWidth;
-            half _ScanAngle;
-            half _Feathering;
+            <span class="pl-k">half</span> _ScanIntensity;
+            <span class="pl-k">half</span> _ScanWidth;
+            <span class="pl-k">half</span> _ScanAngle;
+            <span class="pl-k">half</span> _Feathering;
 
-            half _TimeDuration;
-            half _TimeInterval;
-            int _Reverse;
+            <span class="pl-k">half</span> _TimeDuration;
+            <span class="pl-k">half</span> _TimeInterval;
+            <span class="pl-k">int</span> _Reverse;
             CBUFFER_END
 
             
-            struct Attributes
+            <span class="pl-k">struct</span> Attributes
             {
-                half4 position : POSITION;
-                half2 uv : TEXCOORD0;
-                half4 color : COLOR;
+                <span class="pl-k">half4</span> position : <span class="pl-c1">POSITION</span>;
+                <span class="pl-k">half2</span> uv : <span class="pl-c1">TEXCOORD0</span>;
+                <span class="pl-k">half4</span> color : <span class="pl-c1">COLOR</span>;
             };
 
 
-            struct Varyings
+            <span class="pl-k">struct</span> Varyings
             {
-                half4 position_sv : SV_POSITION;
-                half2 uv : TEXCOORD0;
-                half4 color : COLOR;
+                <span class="pl-k">half4</span> position_sv : <span class="pl-c1">SV_POSITION</span>;
+                <span class="pl-k">half2</span> uv : <span class="pl-c1">TEXCOORD0</span>;
+                <span class="pl-k">half4</span> color : <span class="pl-c1">COLOR</span>;
             };
 
 
-            Varyings Vert(Attributes IN)
+            Varyings <span class="pl-c1">Vert</span>(Attributes IN)
             {
                 Varyings OUT;
-                OUT.position_sv = TransformObjectToHClip(IN.position);
-                OUT.uv = TRANSFORM_TEX(IN.uv,_MainTex);
+                OUT.position_sv = <span class="pl-c1">TransformObjectToHClip</span>(IN.position);
+                OUT.uv = <span class="pl-c1">TRANSFORM_TEX</span>(IN.uv,_MainTex);
                 OUT.color = IN.color;
-                return OUT;
+                <span class="pl-k">return</span> OUT;
             }
 
 
 
-            half4 Frag(Varyings IN) : SV_Target
+            <span class="pl-k">half4</span> <span class="pl-c1">Frag</span>(Varyings IN) : <span class="pl-c1">SV_Target</span>
             {
-                half4 col = SAMPLE_TEXTURE2D_X(_MainTex,sampler_MainTex,IN.uv) * IN.color;
+                <span class="pl-k">half4</span> col = <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex,sampler_MainTex,IN.uv) * IN.color;
 
-                // 时间的变化周期，时间间隔
-                half timey = _Time.y;
-                half timey_normal = timey % (_TimeDuration + _TimeInterval) / _TimeDuration;
-                timey_normal = saturate(timey_normal);
+                <span class="pl-c">// 时间的变化周期，时间间隔</span>
+                <span class="pl-k">half</span> timey = _Time.y;
+                <span class="pl-k">half</span> timey_normal = timey % (_TimeDuration + _TimeInterval) / _TimeDuration;
+                timey_normal = <span class="pl-c1">saturate</span>(timey_normal);
 
 
-                // 扫描效果
-                _ScanAngle = _Reverse==0 ? _ScanAngle : _ScanAngle * -1;
-                half k = tan(radians(_ScanAngle));
-                half cos_v = cos(radians(_ScanAngle));
-                half halfWidth = _ScanWidth / 2 / cos_v;
+                <span class="pl-c">// 扫描效果</span>
+                _ScanAngle = _Reverse==<span class="pl-c1">0</span> ? _ScanAngle : _ScanAngle * -<span class="pl-c1">1</span>;
+                <span class="pl-k">half</span> k = <span class="pl-c1">tan</span>(<span class="pl-c1">radians</span>(_ScanAngle));
+                <span class="pl-k">half</span> cos_v = <span class="pl-c1">cos</span>(<span class="pl-c1">radians</span>(_ScanAngle));
+                <span class="pl-k">half</span> halfWidth = _ScanWidth / <span class="pl-c1">2</span> / cos_v;
 
-                half b,y;
-                if(k &gt; 0)
+                <span class="pl-k">half</span> b,y;
+                <span class="pl-k">if</span>(k &gt; <span class="pl-c1">0</span>)
                 {
-                    b = lerp(-halfWidth-k,1+halfWidth,timey_normal);
+                    b = <span class="pl-c1">lerp</span>(-halfWidth-k,<span class="pl-c1">1</span>+halfWidth,timey_normal);
                     y = k*IN.uv.x + b;
                 }
-                else
+                <span class="pl-k">else</span>
                 {
-                    b = lerp(-halfWidth,1+halfWidth+abs(k),timey_normal);
+                    b = <span class="pl-c1">lerp</span>(-halfWidth,<span class="pl-c1">1</span>+halfWidth+<span class="pl-c1">abs</span>(k),timey_normal);
                     y = k*IN.uv.x + b;
                 }
 
                 
-                half y_min = y - halfWidth;
-                half y_max = y + halfWidth;
-                half uv_y = _Reverse==0 ? IN.uv.y : 1-IN.uv.y;
-                if (uv_y &gt;= y_min &amp;&amp; uv_y &lt;= y_max)
+                <span class="pl-k">half</span> y_min = y - halfWidth;
+                <span class="pl-k">half</span> y_max = y + halfWidth;
+                <span class="pl-k">half</span> uv_y = _Reverse==<span class="pl-c1">0</span> ? IN.uv.y : <span class="pl-c1">1</span>-IN.uv.y;
+                <span class="pl-k">if</span> (uv_y &gt;= y_min &amp;&amp; uv_y &lt;= y_max)
                 {
-                    // 羽化效果
-                    half4 colAdd = _Color * _ScanIntensity;
-                    half feather = smoothstep(halfWidth,0,abs(uv_y - y));
+                    <span class="pl-c">// 羽化效果</span>
+                    <span class="pl-k">half4</span> colAdd = _Color * _ScanIntensity;
+                    <span class="pl-k">half</span> feather = <span class="pl-c1">smoothstep</span>(halfWidth,<span class="pl-c1">0</span>,<span class="pl-c1">abs</span>(uv_y - y));
                     colAdd *= feather;
                     col += colAdd; 
                 }
                 
 
                 
-                return col;
+                <span class="pl-k">return</span> col;
             }
             
 
@@ -918,27 +1130,26 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
             ENDHLSL
         }
     }
-}
-</code></pre>
+}</pre></div>
 </details>
 <details>
 <summary>UIGray</summary>
-<pre class="notranslate"><code class="notranslate">Shader "URP/UIGray"
+<div class="highlight highlight-source-hlsl"><pre class="notranslate">Shader <span class="pl-s">"URP/UIGray"</span>
 {
     Properties
     {
-        [HideInInspector]_MainTex ("Texture", 2D) = "white" {}
+        [HideInInspector]<span class="pl-c1">_MainTex</span> (<span class="pl-s">"Texture"</span>, 2D) = <span class="pl-s">"white"</span> {}
     }
     SubShader
     {
         Tags
         {
-            "RenderType"="Transparent"
-            "RenderPipeline"="UniversalPipeline"
-            "IgnoreProjector"="true"
-            "Queue"="Transparent" // Transparent AlphaTest Geometry Background
+            <span class="pl-s">"RenderType"</span>=<span class="pl-s">"Transparent"</span>
+            <span class="pl-s">"RenderPipeline"</span>=<span class="pl-s">"UniversalPipeline"</span>
+            <span class="pl-s">"IgnoreProjector"</span>=<span class="pl-s">"true"</span>
+            <span class="pl-s">"Queue"</span>=<span class="pl-s">"Transparent"</span> <span class="pl-c">// Transparent AlphaTest Geometry Background</span>
         }
-        LOD 100
+        LOD <span class="pl-c1">100</span>
         Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
@@ -946,51 +1157,51 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
             HLSLPROGRAM
 
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+<span class="pl-k">            #include</span> <span class="pl-s">"Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"</span>
 
-            #pragma vertex Vert
-            #pragma fragment Frag
+<span class="pl-k">            #pragma</span> vertex Vert
+<span class="pl-k">            #pragma</span> fragment Frag
 
 
 
-            TEXTURE2D_X(_MainTex);
-            SAMPLER(sampler_MainTex);
+            <span class="pl-c1">TEXTURE2D_X</span>(_MainTex);
+            <span class="pl-c1">SAMPLER</span>(sampler_MainTex);
 
-            CBUFFER_START(UnityPerMaterial)
-            half4 _MainTex_ST;
+            <span class="pl-c1">CBUFFER_START</span>(UnityPerMaterial)
+            <span class="pl-k">half4</span> _MainTex_ST;
             CBUFFER_END
 
             
-            struct Attributes
+            <span class="pl-k">struct</span> Attributes
             {
-                half4 position : POSITION;
-                half2 uv : TEXCOORD0;
+                <span class="pl-k">half4</span> position : <span class="pl-c1">POSITION</span>;
+                <span class="pl-k">half2</span> uv : <span class="pl-c1">TEXCOORD0</span>;
             };
 
 
-            struct Varyings
+            <span class="pl-k">struct</span> Varyings
             {
-                half4 position_sv : SV_POSITION;
-                half2 uv : TEXCOORD0;
+                <span class="pl-k">half4</span> position_sv : <span class="pl-c1">SV_POSITION</span>;
+                <span class="pl-k">half2</span> uv : <span class="pl-c1">TEXCOORD0</span>;
             };
 
 
-            Varyings Vert(Attributes IN)
+            Varyings <span class="pl-c1">Vert</span>(Attributes IN)
             {
                 Varyings OUT;
-                OUT.position_sv = TransformObjectToHClip(IN.position);
-                OUT.uv = TRANSFORM_TEX(IN.uv,_MainTex);
-                return OUT;
+                OUT.position_sv = <span class="pl-c1">TransformObjectToHClip</span>(IN.position);
+                OUT.uv = <span class="pl-c1">TRANSFORM_TEX</span>(IN.uv,_MainTex);
+                <span class="pl-k">return</span> OUT;
             }
 
 
 
-            half4 Frag(Varyings IN) : SV_Target
+            <span class="pl-k">half4</span> <span class="pl-c1">Frag</span>(Varyings IN) : <span class="pl-c1">SV_Target</span>
             {
-                half4 col = SAMPLE_TEXTURE2D_X(_MainTex,sampler_MainTex,IN.uv);
-                const half3 gray_multiply = half3(0.222h, 0.707h, 0.071h);
-                col.rgb = dot(col.rgb,gray_multiply);
-                return col;
+                <span class="pl-k">half4</span> col = <span class="pl-c1">SAMPLE_TEXTURE2D_X</span>(_MainTex,sampler_MainTex,IN.uv);
+                <span class="pl-k">const</span> <span class="pl-k">half3</span> gray_multiply = <span class="pl-k">half3</span>(<span class="pl-c1">0.</span>222h, <span class="pl-c1">0.</span>707h, <span class="pl-c1">0.</span>071h);
+                col.rgb = <span class="pl-c1">dot</span>(col.rgb,gray_multiply);
+                <span class="pl-k">return</span> col;
             }
             
 
@@ -999,8 +1210,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         }
     }
 }
-
-</code></pre>
+</pre></div>
 </details>
 <details>
 <summary>简单截屏</summary>
@@ -1101,6 +1311,105 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
             <span class="pl-k">return</span> <span class="pl-s1">newpos</span><span class="pl-kos">;</span>
         <span class="pl-kos">}</span></pre></div>
+</details>
+<details>
+<summary>适应字符串</summary>
+<div class="highlight highlight-source-cs"><pre class="notranslate"><span class="pl-k">using</span> <span class="pl-s1">System</span><span class="pl-kos">.</span><span class="pl-s1">Collections</span><span class="pl-kos">.</span><span class="pl-s1">Generic</span><span class="pl-kos">;</span>
+<span class="pl-k">using</span> <span class="pl-s1">UnityEngine</span><span class="pl-kos">;</span>
+<span class="pl-k">using</span> <span class="pl-s1">System</span><span class="pl-kos">.</span><span class="pl-s1">Text</span><span class="pl-kos">;</span>
+<span class="pl-k">using</span> <span class="pl-s1">UnityEngine</span><span class="pl-kos">.</span><span class="pl-s1">UI</span><span class="pl-kos">;</span>
+<span class="pl-k">using</span> <span class="pl-s1">System</span><span class="pl-kos">;</span>
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">BMTextFit</span> <span class="pl-c1">:</span> <span class="pl-smi">MonoBehaviour</span>
+<span class="pl-kos">{</span>
+    <span class="pl-k">public</span> <span class="pl-k">enum</span> <span class="pl-smi">TextCompProp</span>
+    <span class="pl-kos">{</span>
+        <span class="pl-c1">TextLegacy</span><span class="pl-kos">,</span>
+        <span class="pl-c1">TMP_UI</span><span class="pl-kos">,</span>
+        <span class="pl-c1">TMP_3D</span>
+    <span class="pl-kos">}</span>
+
+
+    <span class="pl-kos">[</span><span class="pl-c1">SerializeField</span><span class="pl-kos">]</span> <span class="pl-k">private</span> <span class="pl-smi">TextCompProp</span> <span class="pl-s1">m_textCompProp</span><span class="pl-kos">;</span>
+
+
+    
+    <span class="pl-c">// 字符换字节宽度限制</span>
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">FitText1</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+    <span class="pl-kos">{</span>
+        <span class="pl-k">var</span> <span class="pl-s1">TComp</span> <span class="pl-c1">=</span> <span class="pl-smi">GetComponent</span><span class="pl-c1">&lt;</span><span class="pl-smi">Text</span><span class="pl-c1">&gt;</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">var</span> <span class="pl-s1">origStr</span> <span class="pl-c1">=</span> <span class="pl-s1">TComp</span><span class="pl-kos">.</span><span class="pl-s1">text</span><span class="pl-kos">;</span>
+        <span class="pl-k">var</span> <span class="pl-s1">endIndex</span> <span class="pl-c1">=</span> <span class="pl-c1">20</span><span class="pl-kos">;</span>
+        
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">String</span><span class="pl-kos">.</span><span class="pl-en">IsNullOrEmpty</span><span class="pl-kos">(</span><span class="pl-s1">origStr</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+        
+        <span class="pl-smi">int</span> <span class="pl-s1">bytesCount</span> <span class="pl-c1">=</span> <span class="pl-s1">Encoding</span><span class="pl-kos">.</span><span class="pl-s1">UTF8</span><span class="pl-kos">.</span><span class="pl-en">GetByteCount</span><span class="pl-kos">(</span><span class="pl-s1">origStr</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">bytesCount</span> <span class="pl-c1">&gt;</span> <span class="pl-s1">endIndex</span><span class="pl-kos">)</span>
+        <span class="pl-kos">{</span>
+            <span class="pl-smi">int</span> <span class="pl-s1">readyLength</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span>
+            <span class="pl-smi">float</span> <span class="pl-s1">readyWidth</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span>
+            <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-smi">int</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&lt;</span> <span class="pl-s1">origStr</span><span class="pl-kos">.</span><span class="pl-s1">Length</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span>
+            <span class="pl-kos">{</span>
+                <span class="pl-c">// 中日韩 0x4E00-0x9FFF 字 3字节</span>
+                <span class="pl-c">// 标点符号如下范围</span>
+                <span class="pl-c">// 0x3000-0x303F 0xFF00-0xFFEF 0xFE10-0xFE1F 0xFE30-0xFE4F 3字节</span>
+                <span class="pl-c">// 0x00B7, 0x2014, 0x2026, 0x2018, 0x2019, 0x201C, 0x201D 1字节</span>
+                <span class="pl-s1">readyLength</span> <span class="pl-c1">+=</span> <span class="pl-s1">Encoding</span><span class="pl-kos">.</span><span class="pl-s1">UTF8</span><span class="pl-kos">.</span><span class="pl-en">GetByteCount</span><span class="pl-kos">(</span><span class="pl-k">new</span> <span class="pl-kos">[</span><span class="pl-kos">]</span> <span class="pl-kos">{</span> <span class="pl-s1">origStr</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span> <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+                <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">readyLength</span> <span class="pl-c1">==</span> <span class="pl-s1">endIndex</span><span class="pl-kos">)</span>
+                <span class="pl-kos">{</span>
+                    <span class="pl-s1">origStr</span> <span class="pl-c1">=</span> <span class="pl-s1">origStr</span><span class="pl-kos">.</span><span class="pl-en">Substring</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-s1">i</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">"..."</span><span class="pl-kos">;</span>
+                    <span class="pl-k">break</span><span class="pl-kos">;</span>
+                <span class="pl-kos">}</span>
+                <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">readyLength</span> <span class="pl-c1">&gt;</span> <span class="pl-s1">endIndex</span><span class="pl-kos">)</span>
+                <span class="pl-kos">{</span>
+                    <span class="pl-s1">origStr</span> <span class="pl-c1">=</span> <span class="pl-s1">origStr</span><span class="pl-kos">.</span><span class="pl-en">Substring</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-s1">i</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">"..."</span><span class="pl-kos">;</span>
+                    <span class="pl-k">break</span><span class="pl-kos">;</span>
+                <span class="pl-kos">}</span>
+            <span class="pl-kos">}</span>
+        <span class="pl-kos">}</span>
+
+        <span class="pl-s1">TComp</span><span class="pl-kos">.</span><span class="pl-s1">text</span> <span class="pl-c1">=</span> <span class="pl-s1">origStr</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span>
+
+
+    
+    <span class="pl-c">// 字符串字节渲染宽度限制</span>
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">FitText2</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+    <span class="pl-kos">{</span>
+        <span class="pl-k">var</span> <span class="pl-s1">TComp</span> <span class="pl-c1">=</span> <span class="pl-smi">GetComponent</span><span class="pl-c1">&lt;</span><span class="pl-smi">Text</span><span class="pl-c1">&gt;</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-smi">TextGenerator</span> <span class="pl-s1">textGenerator</span> <span class="pl-c1">=</span> <span class="pl-s1">TComp</span><span class="pl-kos">.</span><span class="pl-s1">cachedTextGenerator</span><span class="pl-kos">;</span>
+        <span class="pl-smi">List</span><span class="pl-c1">&lt;</span><span class="pl-smi">UICharInfo</span><span class="pl-c1">&gt;</span> <span class="pl-s1">list_ui_char</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-smi">List</span><span class="pl-c1">&lt;</span><span class="pl-smi">UICharInfo</span><span class="pl-c1">&gt;</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-s1">textGenerator</span><span class="pl-kos">.</span><span class="pl-en">GetCharacters</span><span class="pl-kos">(</span><span class="pl-s1">list_ui_char</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        
+        <span class="pl-k">var</span> <span class="pl-s1">origStr</span> <span class="pl-c1">=</span> <span class="pl-s1">TComp</span><span class="pl-kos">.</span><span class="pl-s1">text</span><span class="pl-kos">;</span>
+        <span class="pl-k">var</span> <span class="pl-s1">maxWidth</span> <span class="pl-c1">=</span> <span class="pl-c1">300</span><span class="pl-kos">;</span>
+        
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">String</span><span class="pl-kos">.</span><span class="pl-en">IsNullOrEmpty</span><span class="pl-kos">(</span><span class="pl-s1">origStr</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+        
+        <span class="pl-smi">float</span> <span class="pl-s1">readyWidth</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span>
+        <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-smi">int</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&lt;</span> <span class="pl-s1">origStr</span><span class="pl-kos">.</span><span class="pl-s1">Length</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span>
+        <span class="pl-kos">{</span>
+            <span class="pl-s1">readyWidth</span> <span class="pl-c1">+=</span> <span class="pl-s1">list_ui_char</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">.</span><span class="pl-s1">charWidth</span><span class="pl-kos">;</span>
+            <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">maxWidth</span> <span class="pl-c1">==</span> <span class="pl-s1">readyWidth</span><span class="pl-kos">)</span>
+            <span class="pl-kos">{</span>
+                <span class="pl-s1">origStr</span> <span class="pl-c1">=</span> <span class="pl-s1">origStr</span><span class="pl-kos">.</span><span class="pl-en">Substring</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-s1">i</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">"..."</span><span class="pl-kos">;</span>
+                <span class="pl-k">break</span><span class="pl-kos">;</span>
+            <span class="pl-kos">}</span>
+            <span class="pl-k">else</span> <span class="pl-k">if</span><span class="pl-kos">(</span><span class="pl-s1">readyWidth</span> <span class="pl-c1">&gt;</span> <span class="pl-s1">maxWidth</span><span class="pl-kos">)</span>
+            <span class="pl-kos">{</span>
+                <span class="pl-s1">origStr</span> <span class="pl-c1">=</span> <span class="pl-s1">origStr</span><span class="pl-kos">.</span><span class="pl-en">Substring</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-s1">i</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">"..."</span><span class="pl-kos">;</span>
+                <span class="pl-k">break</span><span class="pl-kos">;</span>
+            <span class="pl-kos">}</span>
+        <span class="pl-kos">}</span>
+        
+        <span class="pl-s1">TComp</span><span class="pl-kos">.</span><span class="pl-s1">text</span> <span class="pl-c1">=</span> <span class="pl-s1">origStr</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span>
+    
+    
+<span class="pl-kos">}</span>
+
+
+</pre></div>
 </details></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
