@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 02:01:02 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan.html</link><description>&lt;details&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 02:04:36 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian.html</link><description>&lt;details&gt;
 &lt;summary&gt;UIScan&lt;/summary&gt;
 
 ```
@@ -300,7 +300,7 @@ Shader 'URP/UIGray'
     }
 ```
 
-&lt;/details&gt;。</description><guid isPermaLink="true">https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan.html</guid><pubDate>Mon, 17 Nov 2025 09:30:50 +0000</pubDate></item><item><title>高斯模糊</title><link>https://ogazen.github.io/post/gao-si-mo-hu.html</link><description>&gt; ###### 降采样
+&lt;/details&gt;。</description><guid isPermaLink="true">https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian.html</guid><pubDate>Mon, 17 Nov 2025 09:30:50 +0000</pubDate></item><item><title>高斯模糊</title><link>https://ogazen.github.io/post/gao-si-mo-hu.html</link><description>&gt; ###### 降采样
 &gt; 
 &gt; 降采样（Downsample）也称下采样（Subsample），按字面意思理解即是降低采样频率。</description><guid isPermaLink="true">https://ogazen.github.io/post/gao-si-mo-hu.html</guid><pubDate>Thu, 13 Nov 2025 06:11:48 +0000</pubDate></item><item><title>URP描边效果</title><link>https://ogazen.github.io/post/URP-miao-bian-xiao-guo.html</link><description>##### 法线外扩/视口夹角
 
