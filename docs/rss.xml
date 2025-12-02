@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 02:04:36 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian.html</link><description>&lt;details&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 02:06:00 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian.html</link><description>&lt;details&gt;
 &lt;summary&gt;UIScan&lt;/summary&gt;
 
 ```
@@ -299,6 +299,51 @@ Shader 'URP/UIGray'
         }
     }
 ```
+
+&lt;/details&gt;
+
+
+&lt;details&gt;
+&lt;summary&gt;贝塞尔曲线&lt;/summary&gt;
+
+```cs
+        // 贝塞尔曲线2阶  3个定位点
+        public static Vector3[] GetBezierCurve2(Vector3 start, Vector3 center, Vector3 end, int count = 21)
+        {
+            Vector3[] newpos = new Vector3[count];
+            var maxidx = count - 1;
+            for (int i = 0; i &lt;= maxidx; i++)
+            {
+                var t = i * 1.0f / maxidx;
+                Vector3 aa = start + (center - start) * t;
+                Vector3 bb = center + (end - center) * t;
+                newpos[i] = aa + (bb - aa) * t;
+            }
+
+            return newpos;
+        }
+
+        // 贝塞尔曲线3阶 4个定位点
+        public static Vector3[] GetBezierCurve3(Vector3 start, Vector3 center, Vector3 center2, Vector3 end, int count = 21)
+        {
+            Vector3[] newpos = new Vector3[count];
+            var maxidx = count - 1;
+            for (int i = 0; i &lt;= maxidx; i++)
+            {
+                var t = i * 1.0f / maxidx;
+                Vector3 aa = start + (center - start) * t;
+                Vector3 bb = center + (center2 - center) * t;
+                Vector3 cc = center2 + (end - center2) * t;
+
+                Vector3 aaa = aa + (bb - aa) * t;
+                Vector3 bbb = bb + (cc - bb) * t;
+                newpos[i] = aaa + (bbb - aaa) * t;
+            }
+
+            return newpos;
+        }
+```
+
 
 &lt;/details&gt;。</description><guid isPermaLink="true">https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian.html</guid><pubDate>Mon, 17 Nov 2025 09:30:50 +0000</pubDate></item><item><title>高斯模糊</title><link>https://ogazen.github.io/post/gao-si-mo-hu.html</link><description>&gt; ###### 降采样
 &gt; 

@@ -311,6 +311,51 @@ Shader 'URP/UIGray'
     }
 ```
 
+</details>
+
+
+<details>
+<summary>贝塞尔曲线</summary>
+
+```cs
+        // 贝塞尔曲线2阶  3个定位点
+        public static Vector3[] GetBezierCurve2(Vector3 start, Vector3 center, Vector3 end, int count = 21)
+        {
+            Vector3[] newpos = new Vector3[count];
+            var maxidx = count - 1;
+            for (int i = 0; i <= maxidx; i++)
+            {
+                var t = i * 1.0f / maxidx;
+                Vector3 aa = start + (center - start) * t;
+                Vector3 bb = center + (end - center) * t;
+                newpos[i] = aa + (bb - aa) * t;
+            }
+
+            return newpos;
+        }
+
+        // 贝塞尔曲线3阶 4个定位点
+        public static Vector3[] GetBezierCurve3(Vector3 start, Vector3 center, Vector3 center2, Vector3 end, int count = 21)
+        {
+            Vector3[] newpos = new Vector3[count];
+            var maxidx = count - 1;
+            for (int i = 0; i <= maxidx; i++)
+            {
+                var t = i * 1.0f / maxidx;
+                Vector3 aa = start + (center - start) * t;
+                Vector3 bb = center + (center2 - center) * t;
+                Vector3 cc = center2 + (end - center2) * t;
+
+                Vector3 aaa = aa + (bb - aa) * t;
+                Vector3 bbb = bb + (cc - bb) * t;
+                newpos[i] = aaa + (bbb - aaa) * t;
+            }
+
+            return newpos;
+        }
+```
+
+
 </details>。">
 <meta property="og:title" content="UI扫光、灰化、截屏、适应字符串、贝塞尔曲线">
 <meta property="og:description" content="<details>
@@ -613,6 +658,51 @@ Shader 'URP/UIGray'
         }
     }
 ```
+
+</details>
+
+
+<details>
+<summary>贝塞尔曲线</summary>
+
+```cs
+        // 贝塞尔曲线2阶  3个定位点
+        public static Vector3[] GetBezierCurve2(Vector3 start, Vector3 center, Vector3 end, int count = 21)
+        {
+            Vector3[] newpos = new Vector3[count];
+            var maxidx = count - 1;
+            for (int i = 0; i <= maxidx; i++)
+            {
+                var t = i * 1.0f / maxidx;
+                Vector3 aa = start + (center - start) * t;
+                Vector3 bb = center + (end - center) * t;
+                newpos[i] = aa + (bb - aa) * t;
+            }
+
+            return newpos;
+        }
+
+        // 贝塞尔曲线3阶 4个定位点
+        public static Vector3[] GetBezierCurve3(Vector3 start, Vector3 center, Vector3 center2, Vector3 end, int count = 21)
+        {
+            Vector3[] newpos = new Vector3[count];
+            var maxidx = count - 1;
+            for (int i = 0; i <= maxidx; i++)
+            {
+                var t = i * 1.0f / maxidx;
+                Vector3 aa = start + (center - start) * t;
+                Vector3 bb = center + (center2 - center) * t;
+                Vector3 cc = center2 + (end - center2) * t;
+
+                Vector3 aaa = aa + (bb - aa) * t;
+                Vector3 bbb = bb + (cc - bb) * t;
+                newpos[i] = aaa + (bbb - aaa) * t;
+            }
+
+            return newpos;
+        }
+```
+
 
 </details>。">
 <meta property="og:type" content="article">
@@ -973,6 +1063,44 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
             <span class="pl-k">return</span> <span class="pl-s1">newjpg</span><span class="pl-kos">;</span>
         <span class="pl-kos">}</span>
     <span class="pl-kos">}</span></pre></div>
+</details>
+<details>
+<summary>贝塞尔曲线</summary>
+<div class="highlight highlight-source-cs"><pre class="notranslate">        <span class="pl-c">// 贝塞尔曲线2阶  3个定位点</span>
+        <span class="pl-k">public</span> <span class="pl-k"><span class="pl-k">static</span></span> <span class="pl-smi">Vector3</span><span class="pl-kos">[</span><span class="pl-kos">]</span> <span class="pl-en">GetBezierCurve2</span><span class="pl-kos">(</span><span class="pl-smi">Vector3</span> <span class="pl-s1">start</span><span class="pl-kos">,</span> <span class="pl-smi">Vector3</span> <span class="pl-s1">center</span><span class="pl-kos">,</span> <span class="pl-smi">Vector3</span> <span class="pl-s1">end</span><span class="pl-kos">,</span> <span class="pl-smi">int</span> <span class="pl-s1">count</span> <span class="pl-c1">=</span> <span class="pl-c1">21</span><span class="pl-kos">)</span>
+        <span class="pl-kos">{</span>
+            <span class="pl-smi">Vector3</span><span class="pl-kos">[</span><span class="pl-kos">]</span> <span class="pl-s1">newpos</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-smi">Vector3</span><span class="pl-kos">[</span><span class="pl-s1">count</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+            <span class="pl-k">var</span> <span class="pl-s1">maxidx</span> <span class="pl-c1">=</span> <span class="pl-s1">count</span> <span class="pl-c1">-</span> <span class="pl-c1">1</span><span class="pl-kos">;</span>
+            <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-smi">int</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&lt;=</span> <span class="pl-s1">maxidx</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span>
+            <span class="pl-kos">{</span>
+                <span class="pl-k">var</span> <span class="pl-s1">t</span> <span class="pl-c1">=</span> <span class="pl-s1">i</span> <span class="pl-c1">*</span> <span class="pl-c1">1.0f</span> <span class="pl-c1">/</span> <span class="pl-s1">maxidx</span><span class="pl-kos">;</span>
+                <span class="pl-smi">Vector3</span> <span class="pl-s1">aa</span> <span class="pl-c1">=</span> <span class="pl-s1">start</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">center</span> <span class="pl-c1">-</span> <span class="pl-s1">start</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+                <span class="pl-smi">Vector3</span> <span class="pl-s1">bb</span> <span class="pl-c1">=</span> <span class="pl-s1">center</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">end</span> <span class="pl-c1">-</span> <span class="pl-s1">center</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+                <span class="pl-s1">newpos</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span> <span class="pl-c1">=</span> <span class="pl-s1">aa</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">bb</span> <span class="pl-c1">-</span> <span class="pl-s1">aa</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+            <span class="pl-kos">}</span>
+
+            <span class="pl-k">return</span> <span class="pl-s1">newpos</span><span class="pl-kos">;</span>
+        <span class="pl-kos">}</span>
+
+        <span class="pl-c">// 贝塞尔曲线3阶 4个定位点</span>
+        <span class="pl-k">public</span> <span class="pl-k"><span class="pl-k">static</span></span> <span class="pl-smi">Vector3</span><span class="pl-kos">[</span><span class="pl-kos">]</span> <span class="pl-en">GetBezierCurve3</span><span class="pl-kos">(</span><span class="pl-smi">Vector3</span> <span class="pl-s1">start</span><span class="pl-kos">,</span> <span class="pl-smi">Vector3</span> <span class="pl-s1">center</span><span class="pl-kos">,</span> <span class="pl-smi">Vector3</span> <span class="pl-s1">center2</span><span class="pl-kos">,</span> <span class="pl-smi">Vector3</span> <span class="pl-s1">end</span><span class="pl-kos">,</span> <span class="pl-smi">int</span> <span class="pl-s1">count</span> <span class="pl-c1">=</span> <span class="pl-c1">21</span><span class="pl-kos">)</span>
+        <span class="pl-kos">{</span>
+            <span class="pl-smi">Vector3</span><span class="pl-kos">[</span><span class="pl-kos">]</span> <span class="pl-s1">newpos</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-smi">Vector3</span><span class="pl-kos">[</span><span class="pl-s1">count</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+            <span class="pl-k">var</span> <span class="pl-s1">maxidx</span> <span class="pl-c1">=</span> <span class="pl-s1">count</span> <span class="pl-c1">-</span> <span class="pl-c1">1</span><span class="pl-kos">;</span>
+            <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-smi">int</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&lt;=</span> <span class="pl-s1">maxidx</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span>
+            <span class="pl-kos">{</span>
+                <span class="pl-k">var</span> <span class="pl-s1">t</span> <span class="pl-c1">=</span> <span class="pl-s1">i</span> <span class="pl-c1">*</span> <span class="pl-c1">1.0f</span> <span class="pl-c1">/</span> <span class="pl-s1">maxidx</span><span class="pl-kos">;</span>
+                <span class="pl-smi">Vector3</span> <span class="pl-s1">aa</span> <span class="pl-c1">=</span> <span class="pl-s1">start</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">center</span> <span class="pl-c1">-</span> <span class="pl-s1">start</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+                <span class="pl-smi">Vector3</span> <span class="pl-s1">bb</span> <span class="pl-c1">=</span> <span class="pl-s1">center</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">center2</span> <span class="pl-c1">-</span> <span class="pl-s1">center</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+                <span class="pl-smi">Vector3</span> <span class="pl-s1">cc</span> <span class="pl-c1">=</span> <span class="pl-s1">center2</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">end</span> <span class="pl-c1">-</span> <span class="pl-s1">center2</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+
+                <span class="pl-smi">Vector3</span> <span class="pl-s1">aaa</span> <span class="pl-c1">=</span> <span class="pl-s1">aa</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">bb</span> <span class="pl-c1">-</span> <span class="pl-s1">aa</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+                <span class="pl-smi">Vector3</span> <span class="pl-s1">bbb</span> <span class="pl-c1">=</span> <span class="pl-s1">bb</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">cc</span> <span class="pl-c1">-</span> <span class="pl-s1">bb</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+                <span class="pl-s1">newpos</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span> <span class="pl-c1">=</span> <span class="pl-s1">aaa</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">bbb</span> <span class="pl-c1">-</span> <span class="pl-s1">aaa</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">t</span><span class="pl-kos">;</span>
+            <span class="pl-kos">}</span>
+
+            <span class="pl-k">return</span> <span class="pl-s1">newpos</span><span class="pl-kos">;</span>
+        <span class="pl-kos">}</span></pre></div>
 </details></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 

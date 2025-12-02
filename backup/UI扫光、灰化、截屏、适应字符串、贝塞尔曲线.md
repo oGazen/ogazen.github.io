@@ -300,3 +300,48 @@ Shader "URP/UIGray"
 ```
 
 </details>
+
+
+<details>
+<summary>贝塞尔曲线</summary>
+
+```cs
+        // 贝塞尔曲线2阶  3个定位点
+        public static Vector3[] GetBezierCurve2(Vector3 start, Vector3 center, Vector3 end, int count = 21)
+        {
+            Vector3[] newpos = new Vector3[count];
+            var maxidx = count - 1;
+            for (int i = 0; i <= maxidx; i++)
+            {
+                var t = i * 1.0f / maxidx;
+                Vector3 aa = start + (center - start) * t;
+                Vector3 bb = center + (end - center) * t;
+                newpos[i] = aa + (bb - aa) * t;
+            }
+
+            return newpos;
+        }
+
+        // 贝塞尔曲线3阶 4个定位点
+        public static Vector3[] GetBezierCurve3(Vector3 start, Vector3 center, Vector3 center2, Vector3 end, int count = 21)
+        {
+            Vector3[] newpos = new Vector3[count];
+            var maxidx = count - 1;
+            for (int i = 0; i <= maxidx; i++)
+            {
+                var t = i * 1.0f / maxidx;
+                Vector3 aa = start + (center - start) * t;
+                Vector3 bb = center + (center2 - center) * t;
+                Vector3 cc = center2 + (end - center2) * t;
+
+                Vector3 aaa = aa + (bb - aa) * t;
+                Vector3 bbb = bb + (cc - bb) * t;
+                newpos[i] = aaa + (bbb - aaa) * t;
+            }
+
+            return newpos;
+        }
+```
+
+
+</details>
