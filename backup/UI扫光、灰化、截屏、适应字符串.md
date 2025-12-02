@@ -232,3 +232,71 @@ Shader "URP/UIGray"
 ```
 
 </details>
+
+
+<details>
+<summary>简单截屏</summary>
+
+```cs
+        // 世界坐标转RectTransform本地坐标 
+        // RenderMode = Screen Space - Camera
+        public static Vector2 WorldPosToRtLocalPos(Vector3 worldpos3, RectTransform rectTransform)
+        {
+            Camera camera = Camera.main;
+            Vector2 screenpos2 = RectTransformUtility.WorldToScreenPoint(camera, worldpos3);
+            Vector2 newvec2;
+            bool isCan = RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, screenpos2, camera, out newvec2);
+            if (isCan) return newvec2;
+            else
+            {
+                MyLog.Info("[WorldPosToRtLocalPos]定位失败");
+                return Vector2.zero;
+            }
+        }
+
+        // RenderMode = Screen Space - Camera
+        public static string Screenshot(Camera camera, RectTransform rectTransform)
+        {
+            if (camera == null || rectTransform == null)
+            {
+                MyLog.Error("Camera or rectTransform is null");
+                return null;
+            }
+
+            var path = Application.persistentDataPath + "/Scrshot";
+
+            if (!MyPlatformUtils.ExistsFileOrDir(path)) MyPlatformUtils.CreateDirectory(path);
+            Rect rt = rectTransform.rect;
+
+            RenderTexture rtrender = new RenderTexture(Screen.width, Screen.height, 0);
+            Texture2D screenShot = new Texture2D((int)rt.width, (int)rt.height, TextureFormat.RGB24, false);
+
+            camera.targetTexture = rtrender;
+            camera.Render();
+            RenderTexture.active = rtrender;
+
+            Vector2 scrpos2 = RectTransformUtility.WorldToScreenPoint(camera, rectTransform.position);
+            scrpos2.x += rectTransform.pivot.x * rt.width * -1;
+            scrpos2.y += rectTransform.pivot.y * rt.height * -1;
+
+            float y = Screen.height - scrpos2.y - rt.height;
+            MyLog.Info($"[Screenshot] Pos x:{scrpos2.x},y:{y}"); // 左上角原点
+
+            screenShot.ReadPixels(new Rect(scrpos2.x, y, rt.width, rt.height), 0, 0);
+            screenShot.Apply();
+
+            camera.targetTexture = null;
+            RenderTexture.active = null;
+            GameObject.DestroyImmediate(rtrender);
+
+            byte[] bytes = screenShot.EncodeToJPG();
+
+            String newjpg = path + "/scrshot_" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + "_temp.jpg";
+            MyPlatformUtils.WriteFile(newjpg, bytes);
+            MyLog.Info($"[Screenshot] path:{newjpg}");
+            return newjpg;
+        }
+    }
+```
+
+</details>

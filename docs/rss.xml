@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 02:00:17 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan.html</link><description>&lt;details&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 02:01:02 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan.html</link><description>&lt;details&gt;
 &lt;summary&gt;UIScan&lt;/summary&gt;
 
 ```
@@ -233,7 +233,74 @@ Shader 'URP/UIGray'
 ```
 
 &lt;/details&gt;
-。</description><guid isPermaLink="true">https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan.html</guid><pubDate>Mon, 17 Nov 2025 09:30:50 +0000</pubDate></item><item><title>高斯模糊</title><link>https://ogazen.github.io/post/gao-si-mo-hu.html</link><description>&gt; ###### 降采样
+
+
+&lt;details&gt;
+&lt;summary&gt;简单截屏&lt;/summary&gt;
+
+```cs
+        // 世界坐标转RectTransform本地坐标 
+        // RenderMode = Screen Space - Camera
+        public static Vector2 WorldPosToRtLocalPos(Vector3 worldpos3, RectTransform rectTransform)
+        {
+            Camera camera = Camera.main;
+            Vector2 screenpos2 = RectTransformUtility.WorldToScreenPoint(camera, worldpos3);
+            Vector2 newvec2;
+            bool isCan = RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, screenpos2, camera, out newvec2);
+            if (isCan) return newvec2;
+            else
+            {
+                MyLog.Info('[WorldPosToRtLocalPos]定位失败');
+                return Vector2.zero;
+            }
+        }
+
+        // RenderMode = Screen Space - Camera
+        public static string Screenshot(Camera camera, RectTransform rectTransform)
+        {
+            if (camera == null || rectTransform == null)
+            {
+                MyLog.Error('Camera or rectTransform is null');
+                return null;
+            }
+
+            var path = Application.persistentDataPath + '/Scrshot';
+
+            if (!MyPlatformUtils.ExistsFileOrDir(path)) MyPlatformUtils.CreateDirectory(path);
+            Rect rt = rectTransform.rect;
+
+            RenderTexture rtrender = new RenderTexture(Screen.width, Screen.height, 0);
+            Texture2D screenShot = new Texture2D((int)rt.width, (int)rt.height, TextureFormat.RGB24, false);
+
+            camera.targetTexture = rtrender;
+            camera.Render();
+            RenderTexture.active = rtrender;
+
+            Vector2 scrpos2 = RectTransformUtility.WorldToScreenPoint(camera, rectTransform.position);
+            scrpos2.x += rectTransform.pivot.x * rt.width * -1;
+            scrpos2.y += rectTransform.pivot.y * rt.height * -1;
+
+            float y = Screen.height - scrpos2.y - rt.height;
+            MyLog.Info($'[Screenshot] Pos x:{scrpos2.x},y:{y}'); // 左上角原点
+
+            screenShot.ReadPixels(new Rect(scrpos2.x, y, rt.width, rt.height), 0, 0);
+            screenShot.Apply();
+
+            camera.targetTexture = null;
+            RenderTexture.active = null;
+            GameObject.DestroyImmediate(rtrender);
+
+            byte[] bytes = screenShot.EncodeToJPG();
+
+            String newjpg = path + '/scrshot_' + DateTime.Now.ToString('yyyy_MM_dd_HH_mm_ss') + '_temp.jpg';
+            MyPlatformUtils.WriteFile(newjpg, bytes);
+            MyLog.Info($'[Screenshot] path:{newjpg}');
+            return newjpg;
+        }
+    }
+```
+
+&lt;/details&gt;。</description><guid isPermaLink="true">https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan.html</guid><pubDate>Mon, 17 Nov 2025 09:30:50 +0000</pubDate></item><item><title>高斯模糊</title><link>https://ogazen.github.io/post/gao-si-mo-hu.html</link><description>&gt; ###### 降采样
 &gt; 
 &gt; 降采样（Downsample）也称下采样（Subsample），按字面意思理解即是降低采样频率。</description><guid isPermaLink="true">https://ogazen.github.io/post/gao-si-mo-hu.html</guid><pubDate>Thu, 13 Nov 2025 06:11:48 +0000</pubDate></item><item><title>URP描边效果</title><link>https://ogazen.github.io/post/URP-miao-bian-xiao-guo.html</link><description>##### 法线外扩/视口夹角
 
