@@ -462,6 +462,45 @@ public class BMTextFit : MonoBehaviour
 ```
 
 
+</details>
+
+<details>
+<summary>屏幕场景偏移</summary>
+
+```cs
+    // 3D场景中 单指滑动屏幕屏幕映射到世界平面的位移增量（世界）
+    // 屏幕上的两个点 转换摄像机 平面（点，法线）
+    private static Plane s_plane;
+    private static Vector3 s_plane_delta;
+
+    public static Vector3 GetDeltaForPlane(Vector2 screen_start,Vector2 screen_end,Vector3 pos_world,Vector3 normal,Camera camera = null)
+    {
+        if(!camera) camera = Camera.main;
+
+        Ray ray_a = camera.ScreenPointToRay(screen_start);
+        Ray ray_b = camera.ScreenPointToRay(screen_end);
+        s_plane.SetNormalAndPosition(normal, pos_world);
+
+        float a_distance;
+        float b_distance;
+        bool a_is = s_plane.Raycast(ray_a, out a_distance);
+        bool b_is = s_plane.Raycast(ray_b, out b_distance);
+
+        s_plane_delta.Set(0,0,0);
+        if (a_is && b_is)
+        {
+            Vector3 pos_a = ray_a.GetPoint(a_distance);
+            Vector3 pos_b = ray_b.GetPoint(b_distance);
+            s_plane_delta.x = pos_b.x - pos_a.x;
+            s_plane_delta.y = pos_b.y - pos_a.y;
+            s_plane_delta.z = pos_b.z - pos_a.z;
+        }
+
+        return s_plane_delta;
+    }
+```
+
+
 </details>。">
 <meta property="og:title" content="UI扫光、灰化、截屏、适应字符串、贝塞尔曲线、屏幕场景偏移">
 <meta property="og:description" content="<details>
@@ -913,6 +952,45 @@ public class BMTextFit : MonoBehaviour
 
 
 
+```
+
+
+</details>
+
+<details>
+<summary>屏幕场景偏移</summary>
+
+```cs
+    // 3D场景中 单指滑动屏幕屏幕映射到世界平面的位移增量（世界）
+    // 屏幕上的两个点 转换摄像机 平面（点，法线）
+    private static Plane s_plane;
+    private static Vector3 s_plane_delta;
+
+    public static Vector3 GetDeltaForPlane(Vector2 screen_start,Vector2 screen_end,Vector3 pos_world,Vector3 normal,Camera camera = null)
+    {
+        if(!camera) camera = Camera.main;
+
+        Ray ray_a = camera.ScreenPointToRay(screen_start);
+        Ray ray_b = camera.ScreenPointToRay(screen_end);
+        s_plane.SetNormalAndPosition(normal, pos_world);
+
+        float a_distance;
+        float b_distance;
+        bool a_is = s_plane.Raycast(ray_a, out a_distance);
+        bool b_is = s_plane.Raycast(ray_b, out b_distance);
+
+        s_plane_delta.Set(0,0,0);
+        if (a_is && b_is)
+        {
+            Vector3 pos_a = ray_a.GetPoint(a_distance);
+            Vector3 pos_b = ray_b.GetPoint(b_distance);
+            s_plane_delta.x = pos_b.x - pos_a.x;
+            s_plane_delta.y = pos_b.y - pos_a.y;
+            s_plane_delta.z = pos_b.z - pos_a.z;
+        }
+
+        return s_plane_delta;
+    }
 ```
 
 
@@ -1410,6 +1488,39 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 
 </pre></div>
+</details>
+<details>
+<summary>屏幕场景偏移</summary>
+<div class="highlight highlight-source-cs"><pre class="notranslate">    <span class="pl-c">// 3D场景中 单指滑动屏幕屏幕映射到世界平面的位移增量（世界）</span>
+    <span class="pl-c">// 屏幕上的两个点 转换摄像机 平面（点，法线）</span>
+    <span class="pl-k">private</span> <span class="pl-k"><span class="pl-k">static</span></span> <span class="pl-smi">Plane</span> <span class="pl-s1">s_plane</span><span class="pl-kos">;</span>
+    <span class="pl-k">private</span> <span class="pl-k"><span class="pl-k">static</span></span> <span class="pl-smi">Vector3</span> <span class="pl-s1">s_plane_delta</span><span class="pl-kos">;</span>
+
+    <span class="pl-k">public</span> <span class="pl-k"><span class="pl-k">static</span></span> <span class="pl-smi">Vector3</span> <span class="pl-en">GetDeltaForPlane</span><span class="pl-kos">(</span><span class="pl-smi">Vector2</span> <span class="pl-s1">screen_start</span><span class="pl-kos">,</span><span class="pl-smi">Vector2</span> <span class="pl-s1">screen_end</span><span class="pl-kos">,</span><span class="pl-smi">Vector3</span> <span class="pl-s1">pos_world</span><span class="pl-kos">,</span><span class="pl-smi">Vector3</span> <span class="pl-s1">normal</span><span class="pl-kos">,</span><span class="pl-smi">Camera</span> <span class="pl-s1">camera</span> <span class="pl-c1">=</span> <span class="pl-c1">null</span><span class="pl-kos">)</span>
+    <span class="pl-kos">{</span>
+        <span class="pl-k">if</span><span class="pl-kos">(</span><span class="pl-c1">!</span><span class="pl-s1">camera</span><span class="pl-kos">)</span> <span class="pl-s1">camera</span> <span class="pl-c1">=</span> <span class="pl-s1">Camera</span><span class="pl-kos">.</span><span class="pl-s1">main</span><span class="pl-kos">;</span>
+
+        <span class="pl-smi">Ray</span> <span class="pl-s1">ray_a</span> <span class="pl-c1">=</span> <span class="pl-s1">camera</span><span class="pl-kos">.</span><span class="pl-en">ScreenPointToRay</span><span class="pl-kos">(</span><span class="pl-s1">screen_start</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-smi">Ray</span> <span class="pl-s1">ray_b</span> <span class="pl-c1">=</span> <span class="pl-s1">camera</span><span class="pl-kos">.</span><span class="pl-en">ScreenPointToRay</span><span class="pl-kos">(</span><span class="pl-s1">screen_end</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-s1">s_plane</span><span class="pl-kos">.</span><span class="pl-en">SetNormalAndPosition</span><span class="pl-kos">(</span><span class="pl-s1">normal</span><span class="pl-kos">,</span> <span class="pl-s1">pos_world</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+
+        <span class="pl-smi">float</span> <span class="pl-s1">a_distance</span><span class="pl-kos">;</span>
+        <span class="pl-smi">float</span> <span class="pl-s1">b_distance</span><span class="pl-kos">;</span>
+        <span class="pl-smi">bool</span> <span class="pl-s1">a_is</span> <span class="pl-c1">=</span> <span class="pl-s1">s_plane</span><span class="pl-kos">.</span><span class="pl-en">Raycast</span><span class="pl-kos">(</span><span class="pl-s1">ray_a</span><span class="pl-kos">,</span> <span class="pl-k">out</span> <span class="pl-s1">a_distance</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-smi">bool</span> <span class="pl-s1">b_is</span> <span class="pl-c1">=</span> <span class="pl-s1">s_plane</span><span class="pl-kos">.</span><span class="pl-en">Raycast</span><span class="pl-kos">(</span><span class="pl-s1">ray_b</span><span class="pl-kos">,</span> <span class="pl-k">out</span> <span class="pl-s1">b_distance</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+
+        <span class="pl-s1">s_plane_delta</span><span class="pl-kos">.</span><span class="pl-en">Set</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">0</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">a_is</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-s1">b_is</span><span class="pl-kos">)</span>
+        <span class="pl-kos">{</span>
+            <span class="pl-smi">Vector3</span> <span class="pl-s1">pos_a</span> <span class="pl-c1">=</span> <span class="pl-s1">ray_a</span><span class="pl-kos">.</span><span class="pl-en">GetPoint</span><span class="pl-kos">(</span><span class="pl-s1">a_distance</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+            <span class="pl-smi">Vector3</span> <span class="pl-s1">pos_b</span> <span class="pl-c1">=</span> <span class="pl-s1">ray_b</span><span class="pl-kos">.</span><span class="pl-en">GetPoint</span><span class="pl-kos">(</span><span class="pl-s1">b_distance</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+            <span class="pl-s1">s_plane_delta</span><span class="pl-kos">.</span><span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">pos_b</span><span class="pl-kos">.</span><span class="pl-s1">x</span> <span class="pl-c1">-</span> <span class="pl-s1">pos_a</span><span class="pl-kos">.</span><span class="pl-s1">x</span><span class="pl-kos">;</span>
+            <span class="pl-s1">s_plane_delta</span><span class="pl-kos">.</span><span class="pl-s1">y</span> <span class="pl-c1">=</span> <span class="pl-s1">pos_b</span><span class="pl-kos">.</span><span class="pl-s1">y</span> <span class="pl-c1">-</span> <span class="pl-s1">pos_a</span><span class="pl-kos">.</span><span class="pl-s1">y</span><span class="pl-kos">;</span>
+            <span class="pl-s1">s_plane_delta</span><span class="pl-kos">.</span><span class="pl-s1">z</span> <span class="pl-c1">=</span> <span class="pl-s1">pos_b</span><span class="pl-kos">.</span><span class="pl-s1">z</span> <span class="pl-c1">-</span> <span class="pl-s1">pos_a</span><span class="pl-kos">.</span><span class="pl-s1">z</span><span class="pl-kos">;</span>
+        <span class="pl-kos">}</span>
+
+        <span class="pl-k">return</span> <span class="pl-s1">s_plane_delta</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span></pre></div>
 </details></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 

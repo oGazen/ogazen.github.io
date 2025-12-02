@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 07:00:09 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线、屏幕场景偏移</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian-%E3%80%81-ping-mu-chang-jing-pian-yi.html</link><description>&lt;details&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 07:02:12 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线、屏幕场景偏移</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian-%E3%80%81-ping-mu-chang-jing-pian-yi.html</link><description>&lt;details&gt;
 &lt;summary&gt;UIScan&lt;/summary&gt;
 
 ```hlsl
@@ -448,6 +448,45 @@ public class BMTextFit : MonoBehaviour
 
 
 
+```
+
+
+&lt;/details&gt;
+
+&lt;details&gt;
+&lt;summary&gt;屏幕场景偏移&lt;/summary&gt;
+
+```cs
+    // 3D场景中 单指滑动屏幕屏幕映射到世界平面的位移增量（世界）
+    // 屏幕上的两个点 转换摄像机 平面（点，法线）
+    private static Plane s_plane;
+    private static Vector3 s_plane_delta;
+
+    public static Vector3 GetDeltaForPlane(Vector2 screen_start,Vector2 screen_end,Vector3 pos_world,Vector3 normal,Camera camera = null)
+    {
+        if(!camera) camera = Camera.main;
+
+        Ray ray_a = camera.ScreenPointToRay(screen_start);
+        Ray ray_b = camera.ScreenPointToRay(screen_end);
+        s_plane.SetNormalAndPosition(normal, pos_world);
+
+        float a_distance;
+        float b_distance;
+        bool a_is = s_plane.Raycast(ray_a, out a_distance);
+        bool b_is = s_plane.Raycast(ray_b, out b_distance);
+
+        s_plane_delta.Set(0,0,0);
+        if (a_is &amp;&amp; b_is)
+        {
+            Vector3 pos_a = ray_a.GetPoint(a_distance);
+            Vector3 pos_b = ray_b.GetPoint(b_distance);
+            s_plane_delta.x = pos_b.x - pos_a.x;
+            s_plane_delta.y = pos_b.y - pos_a.y;
+            s_plane_delta.z = pos_b.z - pos_a.z;
+        }
+
+        return s_plane_delta;
+    }
 ```
 
 

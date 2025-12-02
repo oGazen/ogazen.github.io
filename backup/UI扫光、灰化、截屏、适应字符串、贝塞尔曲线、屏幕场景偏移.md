@@ -451,3 +451,42 @@ public class BMTextFit : MonoBehaviour
 
 
 </details>
+
+<details>
+<summary>屏幕场景偏移</summary>
+
+```cs
+    // 3D场景中 单指滑动屏幕屏幕映射到世界平面的位移增量（世界）
+    // 屏幕上的两个点 转换摄像机 平面（点，法线）
+    private static Plane s_plane;
+    private static Vector3 s_plane_delta;
+
+    public static Vector3 GetDeltaForPlane(Vector2 screen_start,Vector2 screen_end,Vector3 pos_world,Vector3 normal,Camera camera = null)
+    {
+        if(!camera) camera = Camera.main;
+
+        Ray ray_a = camera.ScreenPointToRay(screen_start);
+        Ray ray_b = camera.ScreenPointToRay(screen_end);
+        s_plane.SetNormalAndPosition(normal, pos_world);
+
+        float a_distance;
+        float b_distance;
+        bool a_is = s_plane.Raycast(ray_a, out a_distance);
+        bool b_is = s_plane.Raycast(ray_b, out b_distance);
+
+        s_plane_delta.Set(0,0,0);
+        if (a_is && b_is)
+        {
+            Vector3 pos_a = ray_a.GetPoint(a_distance);
+            Vector3 pos_b = ray_b.GetPoint(b_distance);
+            s_plane_delta.x = pos_b.x - pos_a.x;
+            s_plane_delta.y = pos_b.y - pos_a.y;
+            s_plane_delta.z = pos_b.z - pos_a.z;
+        }
+
+        return s_plane_delta;
+    }
+```
+
+
+</details>
