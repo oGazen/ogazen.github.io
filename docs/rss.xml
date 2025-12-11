@@ -1,5 +1,28 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 02 Dec 2025 07:02:12 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线、屏幕场景偏移</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian-%E3%80%81-ping-mu-chang-jing-pian-yi.html</link><description>&lt;details&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Thu, 11 Dec 2025 08:05:08 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>汽车汽油发动机维护</title><link>https://ogazen.github.io/post/qi-che-qi-you-fa-dong-ji-wei-hu.html</link><description>##### 保养补充
+
+* 机油、机滤、空气滤芯
+* 正时皮带，火花塞
+* 轮胎、刹车片、空调滤芯
+
+###### 大众 EA211 1.4TSI
+
+* 火花塞+积碳，水泵+节温器
+* 机油压力调节器和开关漏油
+
+###### 福克斯 1.6L 5MT
+
+* 正时皮带   10W公里左右
+* 膨胀壶　漏防冻液
+* 气门间隙变大 发动机哒哒哒响 很明显
+* ABS泵损坏 刹车踏板不回弹或踩不动 制动距离变长
+* 方向机渗油
+
+###### 福克斯 1.5T 6AT
+
+* 进气歧管机油回流   更换三件套（废弃管，进气歧管，油水分离器）
+* 烧防冻液  尾气冒白烟
+。</description><guid isPermaLink="true">https://ogazen.github.io/post/qi-che-qi-you-fa-dong-ji-wei-hu.html</guid><pubDate>Thu, 11 Dec 2025 08:04:37 +0000</pubDate></item><item><title>UI扫光、灰化、截屏、适应字符串、贝塞尔曲线、屏幕场景偏移</title><link>https://ogazen.github.io/post/UI-sao-guang-%E3%80%81-hui-hua-%E3%80%81-jie-ping-%E3%80%81-shi-ying-zi-fu-chuan-%E3%80%81-bei-sai-er-qu-xian-%E3%80%81-ping-mu-chang-jing-pian-yi.html</link><description>&lt;details&gt;
 &lt;summary&gt;UIScan&lt;/summary&gt;
 
 ```hlsl
