@@ -1,5 +1,61 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Thu, 11 Dec 2025 08:05:08 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>汽车汽油发动机维护</title><link>https://ogazen.github.io/post/qi-che-qi-you-fa-dong-ji-wei-hu.html</link><description>##### 保养补充
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Mon, 15 Dec 2025 05:57:25 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>Docker.Desktop</title><link>https://ogazen.github.io/post/Docker.Desktop.html</link><description>##### 常用运行命令
+
+```bat
+docker run -d -it --name trend-radar
+  -v ./config:/app/config:ro
+  -v ./output:/app/output
+  -e ENV_VARIABLE='VALUE'
+  image:tag
+
+# -d 后台运行
+# -i 保持一个标准输入流(stdin)打开
+# -t 分配一个伪终端
+# -v 绑定(相对路劲)
+# -e 设置环境变量
+# image:tag 镜像和标签
+```
+
+```bash
+# ubuntu 安装包
+apt/apt-get update install xxx
+# alpine 安装包
+apk udpate add xxx
+# 常用包
+sudo(执行权限) 
+wget(下载) 
+curl(下载)
+vim(bash修改文件) 
+gedit(bash修改文件)
+cat(打印文本2bash)
+ca-certificates(证书)
+```
+
+##### 容器内使用Docker(高权限)
+
+* 运行容器必须绑定 `docker run -v /var/run/docker.sock:/var/run/docker.sock ......`
+
+```bash
+##### Ubuntu系统适用 #####
+# 运行以下命令，更新软件包索引并安装添加 Docker 仓库所需的前置软件包：
+sudo apt update
+sudo apt install apt-transport-https curl
+
+
+# 使用以下命令下载并导入 Docker 官方的 GPG 密钥：
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+
+# 将 Docker 的官方仓库添加到 Ubuntu 24.04 LTS 的软件源列表：
+echo 'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release &amp;&amp; echo '$VERSION_CODENAME') stable' | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+
+
+# 刷新软件包列表，以便系统识别新添加的 Docker 仓库：
+# 执行以下命令在 Ubuntu 24.04 LTS 上安装最新版本的 Docker，包括 Docker 引擎及其相关组件：
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# docker-ce：Docker Engine。</description><guid isPermaLink="true">https://ogazen.github.io/post/Docker.Desktop.html</guid><pubDate>Mon, 15 Dec 2025 05:56:58 +0000</pubDate></item><item><title>汽车汽油发动机维护</title><link>https://ogazen.github.io/post/qi-che-qi-you-fa-dong-ji-wei-hu.html</link><description>##### 保养补充
 
 * 机油、机滤、空气滤芯
 * 正时皮带，火花塞
