@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 16 Dec 2025 06:55:08 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>Docker.Desktop</title><link>https://ogazen.github.io/post/Docker.Desktop.html</link><description>##### 常用运行命令
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Gazen's Blog</title><link>https://ogazen.github.io</link><description>欢迎</description><copyright>Gazen's Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/68213482?v=4</url><title>avatar</title><link>https://ogazen.github.io</link></image><lastBuildDate>Tue, 16 Dec 2025 06:58:28 +0000</lastBuildDate><managingEditor>Gazen's Blog</managingEditor><ttl>60</ttl><webMaster>Gazen's Blog</webMaster><item><title>Docker.Desktop</title><link>https://ogazen.github.io/post/Docker.Desktop.html</link><description>##### 常用运行命令
 
 ```bat
 docker run -d -it --name trend-radar
@@ -63,15 +63,14 @@ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin dock
 
 ###### 大众 EA211 1.4TSI
 
-- 正时皮带
-- 火花塞+节气门+进气道积碳(核桃砂)
-- 水泵+节温器
-
-- 气门室盖 止回阀堵塞  有异响
-- 发送机程序升级 气缸失火，轻微抖动
-- 燃油泄漏诊断泵 燃油泄漏诊断泵故障(国六 颗粒捕捉器) [P240200 P240700 P043E00 P245000 P240000 P044700 P148D00 P240A00]
-- 碳管电磁阀 邮箱排气系统故障[P049600 P044100 P04F00]
-- 机油压力调节器、开关、线束 机油容易串到线束中[CSS]
+* 正时皮带
+* 火花塞+节气门+进气道积碳(核桃砂)
+* 水泵+节温器
+* 气门室盖 止回阀堵塞  有异响
+* 发送机程序升级 气缸失火，轻微抖动
+* 燃油泄漏诊断泵 燃油泄漏诊断泵故障(国六 颗粒捕捉器) [P240200 P240700 P043E00 P245000 P240000 P044700 P148D00 P240A00]
+* 碳管电磁阀 邮箱排气系统故障[P049600 P044100 P04F00]
+* 机油压力调节器、开关、线束 机油容易串到线束中[CSS]
 
 
 
