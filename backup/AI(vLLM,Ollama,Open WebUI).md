@@ -95,7 +95,7 @@ export LD_LIBRARY_PATH=path1:$LD_LIBRARY_PATH
 # Cannot use FA version 2 is not supported due to FA2 is only supported on devices with compute capability >= 8
 
 # uv 错误 trying to connect: invalid peer certificate: UnknownIssuer - Even with SSL_CERT_FILE mapped
-# uv --native-tls --allow-insecure-host <your url> <your uv command here>
+uv --native-tls --allow-insecure-host <your url> <your uv command here>
 
 # pip 加速
 uv pip install -index=https://mirrors.aliyun.com/pypi/simple/ <your package name>
@@ -110,5 +110,6 @@ uv pip install -index=https://mirrors.aliyun.com/pypi/simple/ <your package name
 * [解决CUDA环境配置中的\`libcudart.so\`缺失问题-百度开发者中心](https://developer.baidu.com/article/details/3264277)
 * [Failed to find C compiler. Please specify via CC environment variable · Issue #2997 · vllm-project/vllm](https://github.com/vllm-project/vllm/issues/2997)
 * [解决 Ubuntu 中 /usr/local/cuda 缺失问题及 CUDA Toolkit 12.8 的安装修复过程-CSDN博客](https://blog.csdn.net/gs80140/article/details/147896728)
+* [Linux 环境变量](https://cn.linux-terminal.com/?p=8350)
 
 
