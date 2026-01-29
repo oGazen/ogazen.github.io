@@ -3,8 +3,14 @@
     "subTitle":"欢迎",
     "avatarUrl":"https://avatars.githubusercontent.com/u/68213482?v=4",
     "GMEEK_VERSION":"last",
-    "iconList":{"GFMeditor":"M14.85 3c.63 0 1.15.52 1.14 1.15v7.7c0 .63-.51 1.15-1.15 1.15H1.15C.52 13 0 12.48 0 11.84V4.15C0 3.52.52 3 1.15 3ZM9 11V5H7L5.5 7 4 5H2v6h2V8l1.5 1.92L7 8v3Zm2.99.5L14.5 8H13V5h-2v3H9.5Z"},
-    "exlink":{"GFMeditor":"https://ogazen.github.io/gfmeditor"},
+    "iconList":{
+        "GFMeditor":"M14.85 3c.63 0 1.15.52 1.14 1.15v7.7c0 .63-.51 1.15-1.15 1.15H1.15C.52 13 0 12.48 0 11.84V4.15C0 3.52.52 3 1.15 3ZM9 11V5H7L5.5 7 4 5H2v6h2V8l1.5 1.92L7 8v3Zm2.99.5L14.5 8H13V5h-2v3H9.5Z",
+        "Focus":"M47.853,23.304c0.009,0.044,0.016,0.087,0.023,0.131  C47.87,23.392,47.861,23.348,47.853,23.304 M24,14c-13.322,0-24,4.993-24,9.999C0,28.975,10.766,34,24,34  c13.234,0,24-5.038,24-10.001C48,19.037,37.234,14,24,14"
+    },
+    "exlink":{
+        "GFMeditor":"https://ogazen.github.io/gfmeditor",
+        "Focus":"https://ogazen.github.io/files/Focus.pdf"
+    },
     "script":"<script src='https://ogazen.github.io/plugins/GmeekTOC.js'></script>"
 
 }
