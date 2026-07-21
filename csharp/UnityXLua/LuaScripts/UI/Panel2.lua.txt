@@ -1,0 +1,30 @@
+-- Create by wgz
+
+-- TabelName ps: Main;UI_Panel;
+UI_Panel2 = {};
+---@type CS.BehaviourXlua
+local self = self;
+
+function UI_Panel2.awake()
+    print("awake",a,b);
+end
+
+function UI_Panel2.start()
+    print("satrt")
+end
+
+function UI_Panel2.update()
+    print("update")
+end
+
+function UI_Panel2.onenable()
+    print("onenable")
+end
+
+function UI_Panel2.ondisable()
+    print("ondisable")
+end
+
+function UI_Panel2.destroy()
+    print("destroy")
+end

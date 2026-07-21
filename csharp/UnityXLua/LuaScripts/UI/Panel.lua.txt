@@ -1,0 +1,34 @@
+--package.cpath = package.cpath .. ';C:/Users/DELL/AppData/Roaming/JetBrains/Rider2024.3/plugins/EmmyLua/debugger/emmy/windows/x64/?.dll'
+--local dbg = require('emmy_core')
+--dbg.tcpConnect('localhost', 9966)
+
+
+-- Create by wgz
+UI_Panel = {};
+
+local a = 1;
+local b = 2;
+
+function UI_Panel.awake()
+    print("awake",a,b);
+end
+
+function UI_Panel.start()
+    print("satrt");
+end
+
+function UI_Panel.update()
+    print("update");
+end
+
+function UI_Panel.onenable()
+    print("onenable");
+end
+
+function UI_Panel.ondisable()
+    print("ondisable");
+end
+
+function UI_Panel.destroy()
+    print("destroy");
+end

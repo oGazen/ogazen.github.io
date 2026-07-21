@@ -1,0 +1,28 @@
+--package.cpath = package.cpath .. ';C:/Users/DELL/AppData/Roaming/JetBrains/Rider2024.3/plugins/EmmyLua/debugger/emmy/windows/x64/?.dll'
+--local dbg = require('emmy_core')
+--dbg.tcpConnect('localhost', 9966)
+
+Main = {};
+---@type CS.BehaviourXlua
+local self = self;
+
+function Main.awake()
+    print("main awake");
+    local global = _G;
+    
+    print( CS.System.DateTime(2025,1,1));
+    local aaa = CS.UnityEngine.GameObject("aaa")
+    aaa:SetActive(false)
+    
+    local bbb = CS.UnityEngine.GameObject.CreatePrimitive(CS.UnityEngine.PrimitiveType.Sphere)
+    bbb.name = "BBB"
+    
+    
+    self.transform.localPosition = CS.UnityEngine.Vector3.one
+    
+    print(self.gameObject.name)
+end   
+
+function Main.start() 
+    print("main satrt");
+end
